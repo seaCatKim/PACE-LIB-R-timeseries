@@ -1,20 +1,28 @@
 ---
-title: "Day 1: Data cleaning, plotting, and Rmarkdown"
+title: "Day 1.1 Data cleaning"
 author: "Frida Gomam"
-date: 2020-12-01T21:13:14-05:00
+date: "`r Sys.Date()`"
 categories: ["R"]
-tags: ["R Markdown", "plot", "regression"]
+tags: ["dplyr"]
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-# R Markdown
+# Prequesites
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This R workshop assumes basic knowledge of R including:
 
-You can embed an R code chunk like this:
+* Installing and loading packages
+* How to read in data
+    + read.csv
+    + read_csv
+    + and similar
+* Creating objects in R
+    
+
+# Data cleaning
 
 ```{r cars}
 summary(cars)
