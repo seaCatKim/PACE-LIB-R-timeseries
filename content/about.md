@@ -21,5 +21,5 @@ Postdoctoral Associate, School of Biological Sciences CBCS <br>
 Manuela Mendiolar <br>
 PhD Student, School of Maths and Physics <br>
 
-Mathew Holden<br>
+Matthew Holden<br>
 Lecturer, School of Maths and Physics<br>
