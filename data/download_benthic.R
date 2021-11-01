@@ -76,7 +76,7 @@ summary(as.factor(dt1$Quadrat))
 summary(as.factor(dt1$Taxonomy_Substrate_Functional_Group))
 detach(dt1)               
 
-write.csv(dt1, "data/benthic.csv")
+write.csv(dt1, "data/benthic.csv", row.names = FALSE)
 
 
 

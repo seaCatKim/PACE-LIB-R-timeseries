@@ -475,7 +475,7 @@ summary(as.factor(dt4$Sea_State))
 summary(as.factor(dt4$Diver))
 detach(dt4)               
 
-write.csv(dt1, "data/fish_annual.csv")
+write.csv(dt1, "data/fish_annual.csv", row.names = FALSE)
 
 
 
