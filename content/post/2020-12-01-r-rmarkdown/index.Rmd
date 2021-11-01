@@ -1,6 +1,6 @@
 ---
 title: "Day 1.1 Data cleaning"
-author: "x"
+author: "Catherine Kim"
 date: "`r Sys.Date()`"
 categories: ["R"]
 tags: ["dplyr"]
@@ -22,12 +22,20 @@ This R workshop assumes basic knowledge of R including:
 * Creating objects in R
     
 
-# Data cleaning
+# Data manipulation
 
-```{r cars}
-summary(cars)
-fit <- lm(dist ~ speed, data = cars)
-fit
+## Read in the data
+
+```{r read data}
+benthic <- read.csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/data/benthic.csv") %>% 
+  mutate_if(is.character, as.factor)
+levels(benthic$Year)
+levels(benthic$Site)
+
+fish <- read.csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/data/fish_annual.csv") %>% 
+  mutate_if(is.character, as.factor)
+
+envi <- read.csv("x")
 ```
 
 # Including Plots
