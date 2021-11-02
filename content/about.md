@@ -15,14 +15,14 @@ Catherine Kim <br>
 Postdoctoral Associate, School of Biological Sciences, CBCS<br>
 Technology Trainer, UQ Library <br>
 
-![headshot of Caitie Keumpel](/./about_files/cdkeumpel_pic.png)<br>
+<img src="/./about_files/cdkuempel_pic.png" alt="headshot Caitie Kuempel" width="200px" height="200px"/><br>
 Caitie Kuempel <br>
 Postdoctoral Associate, School of Biological Sciences, CBCS <br>
 
-![headshot of Manuela Mendiolar](/./about_files/manuela_pic.jpeg)<br>
+![portrait of Manuela Mendiolar](/./about_files/manuela_pic.jpg)<br>
 Manuela Mendiolar <br>
 PhD Student, School of Maths and Physics, CBCS <br>
 
-![headshot of Matthew Holden](/./about_files/matt_pic.jpeg)<br>
-Matthew Holden<br>
+<img src="/./about_files/matt_pic.jpg" alt="headshot Matt Holden outside" width="200px" height="200px"/><br>
+Matthew Hodlen <br>
 Lecturer, School of Maths and Physics, CBCS<br>
