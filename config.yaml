@@ -21,7 +21,7 @@ menu:
     - name: Twitter
       url: https://twitter.com/UQ_Library
     - name: CBCS
-      url: https://https://cbcs.centre.uq.edu.au/
+      url: //https://cbcs.centre.uq.edu.au/
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
