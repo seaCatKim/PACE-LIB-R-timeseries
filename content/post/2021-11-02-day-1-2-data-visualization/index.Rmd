@@ -790,7 +790,7 @@ Let's make a map using some of the skills we've learned to customize our ggplots
 
 ```{r}
 # First, read in the Jornada Basin vegetation data: 
-jornada_veg <- read_sf(here("data_raw","spatial_vegetation","doc.kml")) %>% dplyr::select(Name) %>% 
+jornada_veg <- read_sf("spatial_vegetation/doc.kml") %>% dplyr::select(Name) %>% 
   clean_names()
 
 # Initial exploratory plot (one plot per attribute)
