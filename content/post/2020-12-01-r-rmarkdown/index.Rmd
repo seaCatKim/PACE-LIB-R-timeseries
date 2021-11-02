@@ -4,6 +4,10 @@ author: "Catherine Kim"
 date: "`r Sys.Date()`"
 categories: ["R"]
 tags: ["dplyr"]
+output:
+  blogdown::html_page:
+    df_print: tibble
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -60,7 +64,7 @@ From the data package: "This package contains values of mean annual aboveground 
 
 ## Load packages
 
-```{r packages}
+```{r packages, warning=TRUE}
 library(tidyverse)
 ```
 
@@ -73,13 +77,14 @@ glimpse(lizards)
 ```
 
 ```{r read lizard codelist, message=FALSE}
-code <- read_table("data/lizardcodelist.txt")
+code <- read_table("data/lizardcodelist.txt", skip = 1)
 glimpse(code)
 ```
 
 ```{r read NPP, message=FALSE}
-npp <- read_csv("data/jornada_npp.csv")
-glimpse
+npp <- read_csv("data/jornada_npp.csv") %>% 
+  mutate_if(is.character, as.factor)
+glimpse(npp)
 ```
 
 # Including Plots
