@@ -89,13 +89,6 @@ glimpse(lizards)
 class(lizards)
 ```
 
-```{r read lizard codelist, message=FALSE}
-code <- read_table("data/lizardcodelist.txt", skip = 1)
-code <-  code[-1,]
-
-glimpse(code)
-```
-
 ### Annual mean estimates net primary production (NPP)
 
 - Peters, D. and L. Huenneke. 2020. Annual mean estimates of aboveground net primary production (NPP) at 15 sites at Jornada Basin LTER, 1989-ongoing ver 104. Environmental Data Initiative. https://doi.org/10.6073/pasta/18dad6748af96c98b72cea3436bf7fe4 (Accessed 2021-11-02).
@@ -246,15 +239,14 @@ lizards_small %>%
   group_by(spp) 
 ```
 
-Summarize by year, site, and species for mean weight. Calculate standard deviation and standard error.
+Summarize by site, and species for mean weight. Calculate standard deviation and standard error.
 
 ```{r summarize and group}
 lizards_small %>%
-  group_by(year, site, spp) %>% 
+  group_by(site, spp) %>% 
   summarize(meanW = mean(weight, na.rm = TRUE),
             SD = sd(weight),
-            SE = SD/sqrt(n()),
-            n())
+            SE = SD/sqrt(n()))
 ```
 
 ## Relational Data aka joins
@@ -265,7 +257,7 @@ Chapter 13 from _[R for Data Science](https://r4ds.had.co.nz/)_ covers relationa
 
 Joins stem from database concepts and there is a lot you can read about them. Here we will focus on the main inner and outer joins.
 
-![diagram of different types of joins](/./pics/joins.png)
+![diagram of different types of joins](joins.png)
 
 Let's say we were interested in seeing if net primary productivity (NPP) had any influence over the length/weights of our lizards over time. The very first step would be to *join* our lizard data and NPP data into one dataframe so we could do some analysis.
 
@@ -310,31 +302,57 @@ right_join(lizards_small, npp, by = c('year', 'zone', 'site'))
 
 And a `full_join()` keeps all observation from both dataframes.
 
-```{r}
+```{r full}
 full_join(lizards_small, npp, by = c('year', 'zone', 'site'))
 ```
 
+## Tidy data
 
-# Make the tidy data for the next session
+Tidy data makes it easy to transform and analyse data in R (and many other tools). Tidy data has observations in rows, and variables in columns. The whole Tidyverse is designed to work with tidy data.
+
+Often, a dataset is organised in a way that makes it easy for humans to read and populate. This is usually called "wide format". Tidy data is _usually_ in "long" format.
+
+The ultimate rules of tidy data are:
+
+* Each row is an observation
+* Each column is a variable
+* Each cell contains one single value
+
+Is the lizards dataset tidy?
+
+> To learn more about Tidy Data, you can read [Hadley Wickham's 2014 article on the topic](https://www.jstatsoft.org/index.php/jss/article/view/v059i10/v59i10.pdf).
+
+### Make the tidy data for the next session
+
+Need to add the scientific and common name to our lizard dataset from the codelist file.
+
+```{r read lizard codelist, message=FALSE}
+code <- read_table("data/lizardcodelist.txt", skip = 1)
+code <-  code[-1,]
+
+glimpse(code)
+```
+
+First, we can combine the SCIENTIFIC and NAME; and COMMON and NAME_1 columns.
 
 ```{r rename code}
 code <- code %>% 
   mutate(scientific_name = paste(SCIENTIFIC, NAME, sep = " "),
-         common_name = paste(COMMON, NAME_1, sep = " ")) %>% 
-  select(-(SCIENTIFIC:NAME_1))
+         common_name = paste(COMMON, NAME_1, sep = " "),
+         spp = CODE) %>% 
+  select(-(CODE:NAME_1))
+code
 ```
 
-# Including Plots
+Then we would want to join the two dataframes right? Which join should we use? What is the key?
 
-You can also embed plots. See Figure \@ref(fig:pie) for example:
+What about reordering the columns in the same order and  changing characters to lower case?
 
-```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}
-par(mar = c(0, 1, 0, 1))
-pie(
-  c(280, 60, 20),
-  c('Sky', 'Sunny side of pyramid', 'Shady side of pyramid'),
-  col = c('#0292D8', '#F7EA39', '#C4B632'),
-  init.angle = -50, border = NA
-)
+```{r name join}
+library(snakecase)
+left_join(lizards, code, by = 'spp') %>% 
+  select(date, scientific_name, common_name, everything()) %>% 
+  mutate_all(tolower)
 ```
+
 
