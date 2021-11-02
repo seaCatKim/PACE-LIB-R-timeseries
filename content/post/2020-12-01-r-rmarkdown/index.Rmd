@@ -18,7 +18,7 @@ knitr::opts_chunk$set(collapse = TRUE, warnings = FALSE)
 
 **Catherine Kim, PhD**
 
-Postdoctoral Associate, School of Biological Sciences
+Postdoctoral Associate, School of Biological Sciences\n
 Technology Trainer, The University of Queensland Library
 
 - c dot kim @uq.edu.au
