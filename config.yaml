@@ -1,6 +1,6 @@
 baseurl: https://cbcs-lib-rworkshop2021.netlify.app/
 languageCode: en-us
-title: My own cool website
+title: R workshop website for CBCS and LIB
 theme: hugo-lithium
 googleAnalytics: ''
 disqusShortname: ''
@@ -25,7 +25,7 @@ menu:
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
-  description: A website built through Hugo and blogdown.
+  description: The accompanying resource for a 2-day R workshop at The University of Queensland run by the Centre for Biodiversity and Conservation Science and the University Library.
   favicon: favicon.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
@@ -35,9 +35,9 @@ params:
   highlightjsVersion: 9.12.0
   logo:
     alt: Logo
-    height: 50
-    url: logo.png
-    width: 50
+    height: 80
+    url: uq_logo.png
+    width: 80
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
