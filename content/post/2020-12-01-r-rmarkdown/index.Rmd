@@ -2,7 +2,7 @@
 title: "Day 1.1 Data manipulation"
 subtitle: "Centre for Biodiversity and Conservation Science + Library R workshop"
 author: "Catherine Kim"
-date: "`r Sys.Date()`"
+date: "2021-11-02"
 categories: ["R"]
 tags: ["dplyr"]
 output:
@@ -14,6 +14,14 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, warnings = FALSE)
 ```
+
+**Catherine Kim, PhD**
+
+Postdoctoral Associate, School of Biological Sciences
+Technology Trainer, The University of Queensland Library
+
+- c dot kim @uq.edu.au
+- [\@fishiinthec](https://twitter.com/fishiinthec)
 
 # Day1
 
