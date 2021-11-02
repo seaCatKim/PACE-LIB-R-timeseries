@@ -9,42 +9,43 @@ output:
   blogdown::html_page:
     df_print: tibble
     toc: true
+    number_sections: TRUE
 ---
 
 <script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
-<li><a href="#day1">Day1</a>
+<li><a href="#day1"><span class="toc-section-number">1</span> Day1</a>
 <ul>
-<li><a href="#prerequisites">Prerequisites</a></li>
-<li><a href="#what-are-we-going-to-learn">What are we going to learn?</a></li>
-<li><a href="#load-packages">Load packages</a></li>
-<li><a href="#read-in-the-data">Read in the data</a>
+<li><a href="#prerequisites"><span class="toc-section-number">1.1</span> Prerequisites</a></li>
+<li><a href="#what-are-we-going-to-learn"><span class="toc-section-number">1.2</span> What are we going to learn?</a></li>
+<li><a href="#load-packages"><span class="toc-section-number">1.3</span> Load packages</a></li>
+<li><a href="#read-in-the-data"><span class="toc-section-number">1.4</span> Read in the data</a>
 <ul>
-<li><a href="#lizard-size-measurement-data">Lizard size measurement data</a></li>
-<li><a href="#annual-mean-estimates-net-primary-production-npp">Annual mean estimates net primary production (NPP)</a></li>
+<li><a href="#lizard-size-measurement-data"><span class="toc-section-number">1.4.1</span> Lizard size measurement data</a></li>
+<li><a href="#annual-mean-estimates-net-primary-production-npp"><span class="toc-section-number">1.4.2</span> Annual mean estimates net primary production (NPP)</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#basic-dplyr-verbs">Basic dplyr verbs</a>
+<li><a href="#basic-dplyr-verbs"><span class="toc-section-number">2</span> Basic dplyr verbs</a>
 <ul>
-<li><a href="#the-pipe-operator">The pipe operator</a></li>
-<li><a href="#pick-variables-with-select">1. Pick variables with <code>select()</code></a>
+<li><a href="#the-pipe-operator"><span class="toc-section-number">2.0.1</span> The pipe operator</a></li>
+<li><a href="#pick-variables-with-select"><span class="toc-section-number">2.1</span> 1. Pick variables with <code>select()</code></a>
 <ul>
-<li><a href="#pick-observations-with-filter">2. Pick observations with <code>filter()</code></a></li>
-<li><a href="#reorder-observations-with-arrange">3. Reorder observations with <code>arrange()</code></a></li>
-<li><a href="#create-new-variables-with-mutate">4. Create new variables with <code>mutate()</code></a></li>
-<li><a href="#collapse-to-a-single-value-with-summarise">5. Collapse to a single value with <code>summarise()</code></a></li>
-<li><a href="#change-the-scope-with-group_by">6. Change the scope with <code>group_by()</code></a></li>
+<li><a href="#pick-observations-with-filter"><span class="toc-section-number">2.1.1</span> 2. Pick observations with <code>filter()</code></a></li>
+<li><a href="#reorder-observations-with-arrange"><span class="toc-section-number">2.1.2</span> 3. Reorder observations with <code>arrange()</code></a></li>
+<li><a href="#create-new-variables-with-mutate"><span class="toc-section-number">2.1.3</span> 4. Create new variables with <code>mutate()</code></a></li>
+<li><a href="#collapse-to-a-single-value-with-summarise"><span class="toc-section-number">2.1.4</span> 5. Collapse to a single value with <code>summarise()</code></a></li>
+<li><a href="#change-the-scope-with-group_by"><span class="toc-section-number">2.1.5</span> 6. Change the scope with <code>group_by()</code></a></li>
 </ul></li>
-<li><a href="#relational-data-aka-joins">Relational Data aka joins</a>
+<li><a href="#relational-data-aka-joins"><span class="toc-section-number">2.2</span> Relational Data aka joins</a>
 <ul>
-<li><a href="#inner-join">Inner join</a></li>
-<li><a href="#outer-joins">Outer joins</a></li>
+<li><a href="#inner-join"><span class="toc-section-number">2.2.1</span> Inner join</a></li>
+<li><a href="#outer-joins"><span class="toc-section-number">2.2.2</span> Outer joins</a></li>
 </ul></li>
-<li><a href="#tidy-data">Tidy data</a>
+<li><a href="#tidy-data"><span class="toc-section-number">2.3</span> Tidy data</a>
 <ul>
-<li><a href="#make-the-tidy-data-for-the-next-session">Make the tidy data for the next session</a></li>
+<li><a href="#make-the-tidy-data-for-the-next-session"><span class="toc-section-number">2.3.1</span> Make the tidy data for the next session</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -57,16 +58,16 @@ Technology Trainer, The University of Queensland Library</p>
 <li>c dot kim <span class="citation">@uq.edu.au</span></li>
 <li><a href="https://twitter.com/fishiinthec">@fishiinthec</a></li>
 </ul>
-<div id="day1" class="section level1">
-<h1>Day1</h1>
+<div id="day1" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Day1</h1>
 <ul>
 <li>Session 1: Data manipulation with <code>dplyr</code></li>
 <li>Session 2: Data visualization with <code>ggplot2</code></li>
 <li>Session 3: Rmarkdown</li>
 <li>Session 4: Practice! #TidyTuesday or BYOData</li>
 </ul>
-<div id="prerequisites" class="section level2">
-<h2>Prerequisites</h2>
+<div id="prerequisites" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Prerequisites</h2>
 <p>This R workshop assumes basic knowledge of R including:</p>
 <ul>
 <li>Installing and loading packages</li>
@@ -80,8 +81,8 @@ Technology Trainer, The University of Queensland Library</p>
 </ul>
 <p>We are happy to have any and all questions though!</p>
 </div>
-<div id="what-are-we-going-to-learn" class="section level2">
-<h2>What are we going to learn?</h2>
+<div id="what-are-we-going-to-learn" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> What are we going to learn?</h2>
 <p>In this hands-on session, you will use R, RStudio and the <code>dplyr</code> package to transform your data.</p>
 <p>Specifically, you will learn how to <strong>explore, filter, reorganise and process</strong> a table of data with the following verbs:</p>
 <ul>
@@ -95,8 +96,8 @@ Technology Trainer, The University of Queensland Library</p>
 <li><code>pivots</code>: transform dataframes into long and wide formats</li>
 </ul>
 </div>
-<div id="load-packages" class="section level2">
-<h2>Load packages</h2>
+<div id="load-packages" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Load packages</h2>
 <pre class="r"><code>library(tidyverse)
 ## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
 ## v ggplot2 3.3.5     v purrr   0.3.4
@@ -113,10 +114,10 @@ library(lubridate)
 ## 
 ##     date, intersect, setdiff, union</code></pre>
 </div>
-<div id="read-in-the-data" class="section level2">
-<h2>Read in the data</h2>
-<div id="lizard-size-measurement-data" class="section level3">
-<h3>Lizard size measurement data</h3>
+<div id="read-in-the-data" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Read in the data</h2>
+<div id="lizard-size-measurement-data" class="section level3" number="1.4.1">
+<h3><span class="header-section-number">1.4.1</span> Lizard size measurement data</h3>
 <p>Our data sets are a curated subset from <a href="https://lter.jornada.nmsu.edu/">Jornada Basin Long Term Ecological Research site</a> in New Mexico, part of the US Long Term Ecological Research (LTER) network:</p>
 <ul>
 <li>Lightfoot, D. and W.G. Whitford. 2020. Lizard pitfall trap data from 11 NPP study locations at the Jornada Basin LTER site, 1989-2006 ver 37. Environmental Data Initiative. <a href="https://doi.org/10.6073/pasta/4a6e258fb49c31e222ecbbcfd128967f" class="uri">https://doi.org/10.6073/pasta/4a6e258fb49c31e222ecbbcfd128967f</a></li>
@@ -158,8 +159,8 @@ glimpse(lizards)
 class(lizards)
 ## [1] &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot;</code></pre>
 </div>
-<div id="annual-mean-estimates-net-primary-production-npp" class="section level3">
-<h3>Annual mean estimates net primary production (NPP)</h3>
+<div id="annual-mean-estimates-net-primary-production-npp" class="section level3" number="1.4.2">
+<h3><span class="header-section-number">1.4.2</span> Annual mean estimates net primary production (NPP)</h3>
 <ul>
 <li>Peters, D. and L. Huenneke. 2020. Annual mean estimates of aboveground net primary production (NPP) at 15 sites at Jornada Basin LTER, 1989-ongoing ver 104. Environmental Data Initiative. <a href="https://doi.org/10.6073/pasta/18dad6748af96c98b72cea3436bf7fe4" class="uri">https://doi.org/10.6073/pasta/18dad6748af96c98b72cea3436bf7fe4</a> (Accessed 2021-11-02).</li>
 </ul>
@@ -176,8 +177,8 @@ glimpse(npp)
 </div>
 </div>
 </div>
-<div id="basic-dplyr-verbs" class="section level1">
-<h1>Basic dplyr verbs</h1>
+<div id="basic-dplyr-verbs" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Basic dplyr verbs</h1>
 <p>The R package <code>dplyr</code> was developed by Hadley Wickham for data manipulation.</p>
 <p>The book <em><a href="https://r4ds.had.co.nz/">R for Data Science</a></em> introduces the package as follows:</p>
 <blockquote>
@@ -191,8 +192,8 @@ glimpse(npp)
 </ul>
 <p>These can all be used in conjunction with <code>group_by()</code> which changes the scope of each function from operating on the entire dataset to operating on it group-by-group. These six functions provide the main <strong>verbs for a language of data manipulation</strong>.</p>
 </blockquote>
-<div id="the-pipe-operator" class="section level3">
-<h3>The pipe operator</h3>
+<div id="the-pipe-operator" class="section level3" number="2.0.1">
+<h3><span class="header-section-number">2.0.1</span> The pipe operator</h3>
 <p>We can make our code more readable and avoid creating useless intermediate objects by <strong>piping</strong> commands into each other. The pipe operator <code>%&gt;%</code> <strong>strings commands together</strong>, using the left side’s output as the first argument of the right side function.</p>
 <p>For example, this command:</p>
 <pre class="r"><code>round(1.23, digits = 1)
@@ -205,8 +206,8 @@ glimpse(npp)
 <p>Note that this material uses the <code>magrittr</code> pipe. The <code>magrittr</code> package is the one that introduced the pipe operator to the R world, and <code>dplyr</code> automatically imports this useful operator when it is loaded. However, the pipe being such a widespread and popular concept in programming and data science, it ended up making it into Base R (the “native” pipe) in 2021 with the release of R 4.1, using a different operator: <code>|&gt;</code>. You can switch your pipe shortcut to the native pipe in <code>Tools &gt; Global options &gt; Code &gt; Use native pipe operator</code>.</p>
 </blockquote>
 </div>
-<div id="pick-variables-with-select" class="section level2">
-<h2>1. Pick variables with <code>select()</code></h2>
+<div id="pick-variables-with-select" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> 1. Pick variables with <code>select()</code></h2>
 <p><code>select()</code> allows us to pick variables (i.e. columns) from the dataset. For example, to only keep the data about year, site, spp, sex, total_length, and weight:</p>
 <blockquote>
 <p>The columns are reordered in the order they are listed and columns can also be renamed.</p>
@@ -297,8 +298,8 @@ lizards %&gt;% select(-(date:zone))
 ##  9 BASN  B         9 CNTE  F     N          22        86          294     16
 ## 10 BASN  B        10 CNTI  M     N         245        70          240      9
 ## # ... with 4,081 more rows, and 2 more variables: tail &lt;fct&gt;, pc &lt;dbl&gt;</code></pre>
-<div id="pick-observations-with-filter" class="section level3">
-<h3>2. Pick observations with <code>filter()</code></h3>
+<div id="pick-observations-with-filter" class="section level3" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> 2. Pick observations with <code>filter()</code></h3>
 <p>The <code>filter()</code> function allows use to pick observations depending on one or several conditions. But to be able to define these conditions, we need to learn about logical operators.</p>
 <p><strong>Logical operators</strong> allow us to <strong>compare things</strong>. Here are some of the most important ones:</p>
 <ul>
@@ -349,8 +350,8 @@ lizards_small %&gt;%
 ## 10 1989-06-27 M     RABB  CNTI  F              285     19
 ## # ... with 787 more rows</code></pre>
 </div>
-<div id="reorder-observations-with-arrange" class="section level3">
-<h3>3. Reorder observations with <code>arrange()</code></h3>
+<div id="reorder-observations-with-arrange" class="section level3" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> 3. Reorder observations with <code>arrange()</code></h3>
 <p><code>arrange()</code> will reorder our rows according to a variable, by default in ascending order:</p>
 <p>When/where was the biggest (total_length) lizard caught?</p>
 <pre class="r"><code>range(lizards_small$total_length, na.rm = TRUE)
@@ -401,8 +402,8 @@ lizards_small %&gt;% arrange(-total_length)
 ## 10 1991-06-25 C     SAND  CNTI  M              321     11
 ## # ... with 4,081 more rows</code></pre>
 </div>
-<div id="create-new-variables-with-mutate" class="section level3">
-<h3>4. Create new variables with <code>mutate()</code></h3>
+<div id="create-new-variables-with-mutate" class="section level3" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> 4. Create new variables with <code>mutate()</code></h3>
 <p>We did some mutating when reading in our data at the start to convert columns to different data types.</p>
 <p><code>mutate()</code> is very versatile and useful! Few other uses include combining with <code>ifelse()</code> conditionals and transforming columns.</p>
 <pre class="r"><code>lizards_small %&gt;% mutate(weight_kg = weight / 1000)
@@ -421,8 +422,8 @@ lizards_small %&gt;% arrange(-total_length)
 ## 10 1989-06-16 G     BASN  CNTI  M              240      9     0.009
 ## # ... with 4,081 more rows</code></pre>
 </div>
-<div id="collapse-to-a-single-value-with-summarise" class="section level3">
-<h3>5. Collapse to a single value with <code>summarise()</code></h3>
+<div id="collapse-to-a-single-value-with-summarise" class="section level3" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> 5. Collapse to a single value with <code>summarise()</code></h3>
 <p><code>summarise()</code> collapses many values down to a single summary. For example, to find the mean weight for the whole dataset:</p>
 <pre class="r"><code>lizards_small %&gt;%
   summarise(meanW = mean(weight, na.rm = TRUE))
@@ -432,8 +433,8 @@ lizards_small %&gt;% arrange(-total_length)
 ## 1  4.34</code></pre>
 <p>However, a single-value summary is not particularly interesting. <code>summarise()</code> becomes more powerful when used with <code>group_by()</code>.</p>
 </div>
-<div id="change-the-scope-with-group_by" class="section level3">
-<h3>6. Change the scope with <code>group_by()</code></h3>
+<div id="change-the-scope-with-group_by" class="section level3" number="2.1.5">
+<h3><span class="header-section-number">2.1.5</span> 6. Change the scope with <code>group_by()</code></h3>
 <p><code>group_by()</code> changes the scope of the following function(s) from operating on the entire dataset to operating on it group-by-group.</p>
 <p>See the effect of the grouping step (in the console):</p>
 <pre class="r"><code>lizards_small %&gt;%
@@ -475,8 +476,8 @@ lizards_small %&gt;% arrange(-total_length)
 ## # ... with 111 more rows</code></pre>
 </div>
 </div>
-<div id="relational-data-aka-joins" class="section level2">
-<h2>Relational Data aka joins</h2>
+<div id="relational-data-aka-joins" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Relational Data aka joins</h2>
 <p>Chapter 13 from <em><a href="https://r4ds.had.co.nz/">R for Data Science</a></em> covers relational data:</p>
 <blockquote>
 <p>It’s rare that a data analysis involves only a single table of data. Typically you have many tables of data, and you must combine them to answer the questions that you’re interested in. Collectively, multiple tables of data are called relational data because it is the relations, not just the individual datasets, that are important.</p>
@@ -506,8 +507,8 @@ glimpse(npp)
 ## $ zone     &lt;fct&gt; C, C, C, G, G, G, M, M, M, P, P, P, T, T, T, C, C, C, G, G, G~
 ## $ site     &lt;fct&gt; CALI, GRAV, SAND, BASN, IBPE, SUMM, NORT, RABB, WELL, COLL, S~
 ## $ npp_g_m2 &lt;dbl&gt; 28.6, 85.7, 103.3, 77.2, 34.1, 53.7, 57.9, 106.1, 79.8, 136.0~</code></pre>
-<div id="inner-join" class="section level3">
-<h3>Inner join</h3>
+<div id="inner-join" class="section level3" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Inner join</h3>
 <p>The simplest join which matches pairs of observation whenever keys are equal.</p>
 <p>zone and site apear in each dataframe - but wouldn’t date or year be useful to include too?</p>
 <pre class="r"><code>lizards_small &lt;-  lizards_small %&gt;% mutate(year = year(date))</code></pre>
@@ -528,8 +529,8 @@ glimpse(npp)
 ## 10 1990-01-04 M     WELL  UKLI  &lt;NA&gt;            NA     NA  1990     79.8
 ## # ... with 3,660 more rows</code></pre>
 </div>
-<div id="outer-joins" class="section level3">
-<h3>Outer joins</h3>
+<div id="outer-joins" class="section level3" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Outer joins</h3>
 <p>A <code>left_join()</code> keeps the observations in the left (x argument) dataframe.</p>
 <pre class="r"><code>left_join(lizards_small, npp, by = c(&#39;year&#39;, &#39;zone&#39;, &#39;site&#39;))
 ## # A tibble: 4,091 x 9
@@ -580,8 +581,8 @@ glimpse(npp)
 ## # ... with 4,339 more rows</code></pre>
 </div>
 </div>
-<div id="tidy-data" class="section level2">
-<h2>Tidy data</h2>
+<div id="tidy-data" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Tidy data</h2>
 <p>Tidy data makes it easy to transform and analyse data in R (and many other tools). Tidy data has observations in rows, and variables in columns. The whole Tidyverse is designed to work with tidy data.</p>
 <p>Often, a dataset is organised in a way that makes it easy for humans to read and populate. This is usually called “wide format”. Tidy data is <em>usually</em> in “long” format.</p>
 <p>The ultimate rules of tidy data are:</p>
@@ -594,8 +595,8 @@ glimpse(npp)
 <blockquote>
 <p>To learn more about Tidy Data, you can read <a href="https://www.jstatsoft.org/index.php/jss/article/view/v059i10/v59i10.pdf">Hadley Wickham’s 2014 article on the topic</a>.</p>
 </blockquote>
-<div id="make-the-tidy-data-for-the-next-session" class="section level3">
-<h3>Make the tidy data for the next session</h3>
+<div id="make-the-tidy-data-for-the-next-session" class="section level3" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> Make the tidy data for the next session</h3>
 <p>Need to add the scientific and common name to our lizard dataset from the codelist file.</p>
 <pre class="r"><code>code &lt;- read_table(&quot;data/lizardcodelist.txt&quot;, skip = 1)
 ## Warning: Duplicated column names deduplicated: &#39;NAME&#39; =&gt; &#39;NAME_1&#39; [5]
