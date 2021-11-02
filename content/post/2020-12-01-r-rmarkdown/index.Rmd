@@ -10,7 +10,10 @@ tags: ["dplyr"]
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-# Prequesites
+# Centre for Biodiversity and Conservation Science + Library R workshop
+# Day1
+
+## Prequesites
 
 This R workshop assumes basic knowledge of R including:
 
@@ -27,15 +30,7 @@ This R workshop assumes basic knowledge of R including:
 ## Read in the data
 
 ```{r read data}
-benthic <- read.csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/data/benthic.csv") %>% 
-  mutate_if(is.character, as.factor)
-levels(benthic$Year)
-levels(benthic$Site)
 
-fish <- read.csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/data/fish_annual.csv") %>% 
-  mutate_if(is.character, as.factor)
-
-envi <- read.csv("x")
 ```
 
 # Including Plots
