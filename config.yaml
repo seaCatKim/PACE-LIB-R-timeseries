@@ -1,4 +1,4 @@
-baseurl: /
+baseurl: https://cbcs-lib-rworkshop2021.netlify.app/
 languageCode: en-us
 title: My own cool website
 theme: hugo-lithium
@@ -17,10 +17,12 @@ menu:
     - name: About
       url: /about/
     - name: GitHub
-      url: https://github.com/seaCatKim
+      url: https://github.com/CBCS-LIB_Rworkshop
     - name: Twitter
-      url: https://twitter.com/fishiintheC
-params:
+      url: https://twitter.com/UQ_Library
+    - name: CBCS
+      url: https://https://cbcs.centre.uq.edu.au/
+  params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
   description: A website built through Hugo and blogdown.
