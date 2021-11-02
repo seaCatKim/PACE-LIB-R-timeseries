@@ -3,6 +3,6 @@ title: Day 1.3 R markdown
 author: ''
 date: '2021-11-02'
 slug: day-1-3-r-markdown
-categories: []
-tags: []
+categories: ["R"]
+tags: ["Rmarkdown"]
 ---
