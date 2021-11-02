@@ -1,5 +1,5 @@
 ---
-title: "Day 1.1 Data cleaning"
+title: "Day 1.1 Data manipulation"
 author: "Catherine Kim"
 date: "`r Sys.Date()`"
 categories: ["R"]
@@ -15,6 +15,7 @@ knitr::opts_chunk$set(collapse = TRUE)
 ```
 
 # Centre for Biodiversity and Conservation Science + Library R workshop
+
 # Day1
 
 * Session 1: Data manipulation with `dplyr`
@@ -68,7 +69,6 @@ From the data package: "This package contains values of mean annual aboveground 
 library(tidyverse)
 ```
 
-
 ## Read in the data
 
 ```{r read lizards, message=FALSE}
@@ -101,17 +101,3 @@ pie(
 )
 ```
 
-```{r}
-summary(Orange)
-```
-
-```{r echo=FALSE}
-library(ggplot2)
-ggplot(Orange, aes(x = age, 
-                   y = circumference, 
-                   color = Tree)) +
-  geom_point() +
-  geom_line() +
-  guides(color = FALSE) +
-  theme_bw()
-```
