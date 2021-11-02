@@ -141,7 +141,7 @@ library(sf)
 ## Read in the lizard data
 
 ```{r}
-lizards <- read_csv(here("data_tidy", "lizards.csv"))
+lizards <- read_csv("lizards.csv")
 ```
 
 # `ggplot2` Basics Review
@@ -634,7 +634,7 @@ Here are some important things to know when considering how to make our data viz
 
 ```{r}
 # Read in the data: 
-mono <- read_csv(here("data_tidy", "mono.csv"))
+mono <- read_csv("mono.csv")
 ```
 
 ```{r}
@@ -866,7 +866,7 @@ Let's make a map using some of the skills we've learned to customize our ggplots
 
 ```{r}
 # First, read in the Jornada Basin vegetation data: 
-jornada_veg <- read_sf(here("data_raw","spatial_vegetation","doc.kml")) %>% dplyr::select(Name) %>% 
+jornada_veg <- read_sf("spatial_vegetation/doc.kml") %>% dplyr::select(Name) %>% 
   clean_names()
 # Initial exploratory plot (one plot per attribute)
 # plot(jornada_veg)
