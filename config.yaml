@@ -23,6 +23,7 @@ menu:
     - name: CBCS
       url: //https://cbcs.centre.uq.edu.au/
 params:
+  orgName: "The University of Queensland"
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
   description: The accompanying resource for a 2-day R workshop at The University of Queensland run by the Centre for Biodiversity and Conservation Science and the University Library.
