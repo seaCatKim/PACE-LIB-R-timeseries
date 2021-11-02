@@ -9,6 +9,7 @@ output:
   blogdown::html_page:
     df_print: tibble
     toc: true
+    number_sections: TRUE
 ---
 
 ```{r setup, include=FALSE}
