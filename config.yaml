@@ -21,7 +21,7 @@ menu:
     - name: Twitter
       url: https://twitter.com/UQ_Library
     - name: CBCS
-      url: //https://cbcs.centre.uq.edu.au/
+      url: https://cbcs.centre.uq.edu.au/
 params:
   orgName: "The University of Queensland"
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
@@ -36,9 +36,9 @@ params:
   highlightjsVersion: 9.12.0
   logo:
     alt: Logo
-    height: 80
+    height: 50
     url: uq_logo.png
-    width: 80
+    width: 50
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
