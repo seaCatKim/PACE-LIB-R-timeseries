@@ -10,7 +10,15 @@ output:
   
 ---
 
-**Allison Horst, PhD**
+**Caitie Kuempel, PhD**
+
+Post-doctoral researcher, Coral Reef Ecosystems Lab, University of Queensland
+
+- c.kuempel@uq.edu.au
+- [\@cdkuempel](https://twitter.com/cdkuempel)
+
+
+These materials were created by **Allison Horst, PhD**
 
 Assistant Teaching Professor, Bren School, UC Santa Barbara
 
@@ -42,12 +50,9 @@ Assistant Teaching Professor, Bren School, UC Santa Barbara
 - Keep learning
 
 
-
 # Citations and data
 
 ## R packages
-
-Thank you to developers, sharers, teachers, and the entire R community for building things and creating resources to help us all learn. I'd especially like to thank developers & maintainers for the following packages: 
 
 - `tidyverse`: Wickham et al., (2019). Welcome to the tidyverse. Journal of
   Open Source Software, 4(43), 1686,
@@ -107,7 +112,7 @@ You can get the workshop materials in two ways:
 
 ## Create a new R Markdown document or R script
 
-Allison will be working in R Markdown, but you can follow along in either an .Rmd or R script. 
+I will be working in R Markdown, but you can follow along in either an .Rmd or R script. 
 
 ## Attach R packages
 
@@ -120,7 +125,6 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
 library(here)
 library(janitor)
-
 # Specifically for plots:
 library(patchwork)
 library(ggrepel)
@@ -128,21 +132,17 @@ library(gghighlight)
 library(paletteer)
 library(ggExtra)
 library(ggbeeswarm)
-
 # And for another dataset we'll explore:
 library(gapminder)
-
 # Spatial
 library(sf)
-
 ```
 
 ## Read in the lizard data
 
 ```{r}
-lizards <- read_csv("lizards.csv")
+lizards <- read_csv(here("data_tidy", "lizards.csv"))
 ```
-
 
 # `ggplot2` Basics Review
 
@@ -160,15 +160,12 @@ For example:
 
 ```{r, eval = FALSE}
 # ggplot essential pieces, 3 ways (that do the same thing):
-
 # Like this: 
 ggplot(data = lizards, aes(x = total_length, y = weight)) + # That's 1 & 2
   geom_point() # That's 3
-
 # Or, alternatively:
 ggplot(data = lizards) +
   geom_point(aes(x = total_length, y = weight))
-
 # Or another way:
 ggplot() +
   geom_point(data = lizards, aes(x = total_length, y = weight))
@@ -316,10 +313,13 @@ ggplot(data = lizards, aes(x = total_length, y = weight)) +
 ```{r}
 lizard_counts <- lizards %>% 
   count(common_name)
+ggplot(data = lizard_counts, aes(y = common_name, x = n)) +
+  geom_col()
+```
 
+```{r}
 ggplot(data = lizard_counts, aes(y = fct_reorder(common_name, n), x = n)) +
   geom_col()
-
 ```
 
 ## `ggplot` basics: synthesis examples
@@ -334,7 +334,7 @@ ggplot(data = lizard_counts, aes(y = fct_reorder(common_name, n), x = n)) +
 
 ```{r}
 ggplot(data = lizards, aes(x = total_length, y = weight)) +
-  geom_point(aes(color = common_name, shape = common_name), 
+  geom_point(aes(color = common_name), 
              fill = "black",
              size = 2) +
   theme_minimal() +
@@ -349,15 +349,14 @@ ggplot(data = lizards, aes(x = total_length, y = weight)) +
 Let's make a stacked column graph of lizard species by site: 
 
 ```{r}
+# fct_infreq(): reorder factor levels by number of observations with each level (largest first)
 ggplot(data = lizards, aes(y = fct_infreq(common_name))) +
   geom_bar(aes(fill = site)) +
   theme_bw() +
   labs(x = "Lizard counts",
        y = "Species (common name)") +
   facet_grid(sex ~ tail)
-
 # That annoying space below zero? Let's keep that in mind...
-
 ```
 
 # Advanced `ggplot2` customization
@@ -391,7 +390,6 @@ Within those layers added to your plot, you can update the `breaks = `, `limits 
 ```{r}
 ggplot(data = lizards, aes(x = total_length, y = weight)) +
   geom_point()
-
 ggplot(data = lizards, aes(x = total_length, y = weight)) +
   geom_point() +
   scale_x_continuous(breaks = c(0, 250, 500), 
@@ -409,23 +407,6 @@ ggplot(data = lizards, aes(x = total_length, y = weight)) +
   scale_x_log10()
 ```
 
-And it is really nice for formatting axis dates. Let's make a version of the data with lizard counts by date to try a few things: 
-
-```{r}
-lizard_counts <- lizards %>% 
-  mutate(date = lubridate::mdy(date)) %>% 
-  count(date)
-
-ggplot(data = lizard_counts, aes(x = date, y = n)) +
-  geom_line() +
-  scale_x_date(breaks = scales::breaks_width("3 years"), # See date_breaks for next year!
-               labels = scales::label_date("'%y")) + # See date_labels for next year!
-  scale_y_log10(labels = scales::label_scientific())
-
-ggplot(data = lizard_counts, aes(x = date, y = n)) +
-  geom_line() +
-  scale_x_date(breaks = scales::breaks_pretty())
-```
 
 Explore the different options for `label_*` that appear once you start typing it in...you'll see a bunch of different options. Make your tick marks currencies, scientific notation, or more - just by updating the labels within the correct `scale_`! Go ahead & try it out, it's pretty amazing (and see the many different label options here: https://scales.r-lib.org/reference/index.html). 
 
@@ -441,21 +422,19 @@ For example, is it a **fill** aesthetic you're hoping to customize? Then you mig
 ggplot(data = lizards, aes(x = total_length, y = weight)) +
   geom_point(aes(color = weight)) +
   scale_color_gradient(low = "red", high = "navy")
+```
 
+```{r}
 # Or have more than 2 colors in your gradient: 
 ggplot(data = lizards, aes(x = total_length, y = weight)) +
   geom_point(aes(color = weight)) +
   scale_color_gradientn(colors = c("orange", "red", "purple", "navy", "black"))
-
 # Or use a palette from paletteer! 
 # Check out options: https://emilhvitfeldt.github.io/paletteer/
-
 # ggplot(data = lizards, aes(x = total_length, y = weight)) +
 #   geom_point(aes(color = weight)) +
 #   scale_color_paletteer_c("scico::oslo")
-
 # See more continuous palettes with View(palettes_c_names)
-
 ```
 
 There are also great options for *binning* colors for a continuous variable, including with the `scale_*_steps()` functions (see more: https://ggplot2.tidyverse.org/reference/scale_steps.html). For example, maybe in the graph above we want binned (instead of continuous gradient) color values:
@@ -464,13 +443,11 @@ There are also great options for *binning* colors for a continuous variable, inc
 ggplot(data = lizards, aes(x = total_length, y = weight)) +
   geom_point(aes(color = weight)) +
   scale_color_steps(low = "red", high = "black")
-
 # Notice the binned legend - within bins all points are the same value. 
 # Use n.breaks =  or breaks = c() to manually set the break number or value.
 ```
 
 You can create a divergent binned scheme with `scale_*_steps2()`:
-
 
 ```{r}
 ggplot(data = lizards, aes(x = total_length, y = weight)) +
@@ -498,14 +475,13 @@ ggplot(data = lizards, aes(x = common_name, y = total_length)) +
   geom_boxplot(aes(fill = common_name), color = "black", show.legend = FALSE) +
   theme_minimal() +
   coord_flip()
+```
 
+```{r}
 # But **order matters**, so let's make an ordered version: 
-
 lizards_mean <- lizards %>% 
   mutate(common_name = fct_reorder(common_name, total_length, .fun = median))
-
 # Then make a graph (use View(palettes_d_names) to see other discrete palettes in {paletteer})
-
 ggplot(data = lizards_mean, aes(y = common_name, x = total_length)) +
   geom_boxplot(aes(fill = common_name), show.legend = FALSE) +
   scale_x_continuous(limits = c(0, 500)) +
@@ -515,13 +491,16 @@ ggplot(data = lizards_mean, aes(y = common_name, x = total_length)) +
   theme_minimal()
 ```
 
-Cool let's try another one: Find counts of lizard by species, reorder factor levels by count, update aesthetic by color (removing redundant legend), customize color using something from `paletteer`:
+Cool let's try another one! 
+
+**Challenge**
+
+Find counts of lizard by species, reorder factor levels by count, update aesthetic by color (removing redundant legend), customize color using something from `paletteer`:
 
 ```{r}
 lizard_n <- lizards %>% 
   count(common_name) %>% 
   mutate(common_name = fct_reorder(common_name, n))
-
 ggplot(data = lizard_n, aes(y = common_name, x = n)) +
   geom_col(aes(fill = common_name), show.legend = FALSE) +
   scale_fill_paletteer_d("tidyquant::tq_dark") +
@@ -541,16 +520,22 @@ We can update gridline frequency by changing breaks, but we may want to customiz
 ```{r}
 p <- ggplot(data = lizards, aes(x = total_length, y = weight)) +
   geom_point()
+p
+```
 
+```{r}
 p + 
   theme(panel.grid = element_blank()) # removes all gridlines (major & minor)
+```
 
+```{r}
 p + 
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_line(color = "red"))
+```
 
+```{r}
 # Now let's just go bananas with some theme stuff: 
-
 p + 
   theme(panel.background = element_rect(color = "purple", size = 3, fill = "yellow"),
         panel.grid.major.y = element_line(color = "orange"),
@@ -561,9 +546,18 @@ p +
         axis.title.y = element_text(color = "gray70"),
         text = element_text(size = 12, family="serif"),
         plot.background = element_rect(fill = "pink"))
-
 # Watch Kara Woo's talk from RStudio Conference 2021!
 ```
+
+## More fun with colors
+
+There are a lot of options for colors in R. Color schemes can be very important for figures and are also a great way to have some fun.
+
+Here are some useful resources that may help:
+
+1. The **ggsci** R package contains a collection of high-quality color palettes inspired by colors used in scientific journals, data visualization libraries, and more.
+2. There are even color palettes inspired by Beyonce and Wes Andersen movies.
+3. Other great resources include [`Color Hexa`](colorhex.com) and the [`colortools package`](http://www.sthda.com/english/wiki/the-elements-of-choosing-colors-for-great-data-visualization-in-r)
 
 ## Direct annotation and thresholds
 
@@ -582,12 +576,51 @@ p +
   geom_hline(yintercept = 40, linetype = "dotted", color = "blue") +
   geom_vline(xintercept = 20, linetype = "dashed", color = "green") +
   theme_minimal()
+```
 
+```{r}
 # Or, have the value be determined based on a variable: 
 p +
   geom_hline(yintercept = mean(lizards$weight), linetype = "dashed", color = "red") +
   annotate("text", x = 350, y = mean(lizards$weight) + 2, label = "Mean weight", color = "red")
 ```
+## Add in some graphics if you want to be really fancy
+
+The [`rphylopic`](https://jacintak.github.io/post/2021-08-01-rphylopic/) package is an easy way to add in some vector images.
+
+```{r}
+library(rphylopic)
+```
+
+```{r}
+unique(lizards$scientific_name)
+```
+
+```{r}
+lizard_pic <- name_search(text = "Cnemidophorus", options = "namebankID")[[1]] # find names
+lizard_pic
+```
+```{r}
+lizard_id_all <- name_images(uuid = lizard_pic$uid[1])  # list images
+lizard_id_all
+```
+
+```{r}
+lizard_id <- name_images(uuid = lizard_pic$uid[1])$supertaxa[[1]]$uid  # get individual image id
+lizard_id
+```
+
+```{r}
+lizard_image <- image_data(lizard_id, size = 256)[[1]] # get actual icon, define size. Don't run this alone
+```
+
+
+```{r}
+p+add_phylopic(lizard_image, alpha = 1, x = 375, y = 50, ysize = 25) +
+  theme_light()
+```
+
+Note that you can also load in ['IAN symbol library'](https://twitter.com/F_J_Heather/status/1455333432523849730/photo/1) graphics and use them in R plots
 
 ### Apply what we've learned to something new! 
 
@@ -601,11 +634,11 @@ Here are some important things to know when considering how to make our data viz
 
 ```{r}
 # Read in the data: 
-mono <- read_csv("mono.csv")
+mono <- read_csv(here("data_tidy", "mono.csv"))
 ```
 
 ```{r}
-ggplot(data = mono, aes(x = year, y = lake_level)) +
+lake_plot<-ggplot(data = mono, aes(x = year, y = lake_level)) +
   geom_rect(aes(xmin = 1941, 
                 xmax = 1983, 
                 ymin = 6350, 
@@ -635,7 +668,19 @@ ggplot(data = mono, aes(x = year, y = lake_level)) +
            y = 6367, 
            label = "Decreased shrimp abundance expected\n(6,360 feet above sea level)",
            size = 3)
-  
+lake_plot
+```
+
+```{r}
+shrimp <- name_search(text = "Shrimp", options = "namebankID")[[1]] # find names
+shrimp_id_all <- name_images(uuid = shrimp$uid[1])  # list images
+shrimp_id <- name_images(uuid = shrimp$uid[1])$same[[1]]$uid  # get individual image id
+shrimp_image<-image_data(shrimp_id, size = 256)[[1]] # get actual icon, define size. Don't run this alone
+```
+
+
+```{r}
+lake_plot + add_phylopic(shrimp_image, alpha = 1, x = 1875, y = 6365, ysize = 10)
 ```
 
 ### Aside: better legends
@@ -643,8 +688,7 @@ ggplot(data = mono, aes(x = year, y = lake_level)) +
 ```{r}
 two_lizards <- lizards %>% 
   filter(common_name %in% c("eastern fence", "western whiptail"))
-
-ggplot(data = two_lizards, aes(x = total_length, y = weight)) +
+two_lizards_plot<-ggplot(data = two_lizards, aes(x = total_length, y = weight)) +
   geom_point(aes(color = common_name,
                  shape = common_name),
              size = 2) +
@@ -653,7 +697,15 @@ ggplot(data = two_lizards, aes(x = total_length, y = weight)) +
                      labels = c("Eastern fence lizard", "Western whiptail")) +
   scale_shape_discrete(name = "Lizard species:",
                        labels = c("Eastern fence lizard", "Western whiptail")) +
-  theme_minimal() +
+  theme_minimal() 
+two_lizards_plot
+```
+
+
+You can move the legend inside of the figure, if appropriate
+
+```{r}
+two_lizards_plot +
   theme(legend.position = c(0.2, 0.8),
         legend.background = element_blank()) # And check out other legend.* options...it's a lot.
 ```
@@ -665,7 +717,6 @@ Direct labeling with a bunch of groups is challenging - `ggrepel` is here to hel
 ```{r}
 wwc_lizards <- lizards %>% 
   filter(common_name =="western whiptail", site == "sand")
-
 ggplot(data = wwc_lizards, aes(x = total_length, y = weight)) +
   geom_point() +
   geom_text_repel(aes(label = toe_num), size = 3, max.overlaps = 20, show.legend = FALSE) 
@@ -687,20 +738,40 @@ This can be particularly useful if you have made a bunch of observations or seri
 
 Add `gghighlight()` to your `ggplot` to specify highlighting conditions. 
 
+Let's look at what our plot was before
+
+```{r}
+p
+```
+
+Let's highlight toe marker number value equal to 250
+
 ```{r}
 p +
   gghighlight(toe_num == 250, label_key = toe_num)
+```
 
+Now let's highlight two of the sites
+
+```{r}
 p + 
   aes(color = site) + # Best to include this in geom_ line instead of here...
   gghighlight(site %in% c("cali", "grav"))
+```
 
+```{r}
 # One more example: 
 q <- ggplot(data = lizards, aes(x = total_length, y = weight, group = common_name)) +
   geom_line(aes(color = common_name)) +
   gghighlight(max(weight, na.rm = TRUE) > 30)
-
 q
+```
+
+## Another aside: trend lines!
+
+```{r}
+p + 
+  geom_smooth(method = "lm", se = TRUE)
 ```
 
 # Compound figures with `patchwork`
@@ -712,23 +783,30 @@ Let's store a couple of different graphs (we already have `p` and `q` stored):
 ```{r}
 (p | q) & # & means it's applied to both plots! 
   theme_minimal()
+```
 
+```{r}
+p+q+plot_annotation(tag_levels = "A")
+```
+
+
+```{r}
 z <- ggplot(data = lizards, aes(y = site, x = weight)) +
   geom_boxplot(aes(fill = site), show.legend = FALSE)
-
 # Put them all together using PEMDAS structure
-((p | q) / z) & theme_dark() 
+((p | q) / z) + plot_annotation(tag_levels = "a") & theme_dark() 
 ```
 
 # Explore some new graph types
 
 ## Marginal plots
 
+A rug plot is a compact visualisation designed to supplement a 2d display with the two 1d marginal distributions. Rug plots display individual cases so are best used with smaller datasets.
+
 ```{r}
 whiptails <- lizards %>% 
   filter(common_name == "western whiptail") %>% 
   drop_na(total_length, weight)
-
 # An issue with rug plots: 
 ggplot(data = whiptails, aes(x = total_length, y = weight)) +
   geom_point() +
@@ -746,10 +824,8 @@ p <- ggplot(data = whiptails, aes(x = total_length, y = weight)) +
   theme(legend.position = "bottom") + 
   labs(x = "Total length (mm)", 
        y = "Weight (grams)")
-
 # Example 1: A histogram
 # ggMarginal(p, type = "histogram", fill = "gray60", color = NA)
-
 # Example 2: A boxplot, grouped by sex (as in the plot)
 ggMarginal(p, type = "boxplot", groupColour = TRUE)
 ```
@@ -775,7 +851,6 @@ lizard_counts <- lizards %>%
   mutate(date = lubridate::mdy(date)) %>% 
   count(year = lubridate::year(date), common_name) %>% 
   drop_na()
-
 # Make a heatmap of counts:
 ggplot(data = lizard_counts, aes(x = year, y = common_name)) +
   geom_tile(aes(fill = n), show.legend = FALSE) +
@@ -791,19 +866,24 @@ Let's make a map using some of the skills we've learned to customize our ggplots
 
 ```{r}
 # First, read in the Jornada Basin vegetation data: 
-jornada_veg <- read_sf("spatial_vegetation/doc.kml") %>% dplyr::select(Name) %>% 
+jornada_veg <- read_sf(here("data_raw","spatial_vegetation","doc.kml")) %>% dplyr::select(Name) %>% 
   clean_names()
-
 # Initial exploratory plot (one plot per attribute)
 # plot(jornada_veg)
-
 # Remember, you can see the paletteer palettes with: 
 # View(palettes_c_names)
 # View(palettes_d_names)
-
 ggplot() +
   geom_sf(data = jornada_veg, 
-          aes(fill = name),
+          aes(fill = Name),
+          color = NA) 
+# For next year: how would you change increments of lat / lon on x & y axis? See coord_map()
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = jornada_veg, 
+          aes(fill = Name),
           color = NA) +
   theme_minimal() +
   scale_fill_paletteer_d(palette = "ggthemes::manyeys") +
@@ -817,10 +897,7 @@ ggplot() +
         plot.caption.position = "plot",
         plot.caption = element_text(face = "italic", color = "gray30"),
         axis.text = element_text(size = 5))
-
-# For next year: how would you change increments of lat / lon on x & y axis? See coord_map()
 ```
-
 
 
 # Export your graphs & figures
@@ -830,12 +907,12 @@ Use `ggsave()` to export your figures, setting the dimensions, dpi, and more. Th
 See `?ggsave` for documentation. 
 
 ```{r, eval = FALSE}
-ggsave(filename = "file_name.png", width = 6, height = 4)
+ggsave(filename = "file_name.png", width = 6, height = 4, dpi = 300)
 ```
 
 # Learn more
 
-Here are some of my favorite resources for building advanced data visualization tools in `ggplot2`, learning about new types of graphs, and choosing an appropriate graph type: 
+Here are some great resources for building advanced data visualization tools in `ggplot2`, learning about new types of graphs, and choosing an appropriate graph type: 
 
 ## Books
 
