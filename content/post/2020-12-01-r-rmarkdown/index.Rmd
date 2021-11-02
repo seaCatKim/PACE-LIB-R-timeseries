@@ -18,13 +18,13 @@ knitr::opts_chunk$set(collapse = TRUE, warnings = FALSE)
 
 **Catherine Kim, PhD**
 
-Postdoctoral Associate, School of Biological Sciences\n
+Postdoctoral Associate, School of Biological Sciences  
 Technology Trainer, The University of Queensland Library
 
 - c dot kim @uq.edu.au
 - [\@fishiinthec](https://twitter.com/fishiinthec)
 
-# Day1
+# Today's schedule
 
 * Session 1: Data manipulation with `dplyr`
 * Session 2: Data visualization with `ggplot2`
@@ -258,7 +258,7 @@ lizards_small %>%
             SE = SD/sqrt(n()))
 ```
 
-## Relational Data aka joins
+# Relational Data aka joins
 
 Chapter 13 from _[R for Data Science](https://r4ds.had.co.nz/)_ covers relational data:
 
@@ -315,7 +315,7 @@ And a `full_join()` keeps all observation from both dataframes.
 full_join(lizards_small, npp, by = c('year', 'zone', 'site'))
 ```
 
-## Tidy data
+# Tidy data
 
 Tidy data makes it easy to transform and analyse data in R (and many other tools). Tidy data has observations in rows, and variables in columns. The whole Tidyverse is designed to work with tidy data.
 

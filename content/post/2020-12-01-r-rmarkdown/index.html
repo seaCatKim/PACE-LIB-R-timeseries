@@ -38,15 +38,15 @@ output:
 <li><a href="#collapse-to-a-single-value-with-summarise"><span class="toc-section-number">2.1.4</span> 5. Collapse to a single value with <code>summarise()</code></a></li>
 <li><a href="#change-the-scope-with-group_by"><span class="toc-section-number">2.1.5</span> 6. Change the scope with <code>group_by()</code></a></li>
 </ul></li>
-<li><a href="#relational-data-aka-joins"><span class="toc-section-number">2.2</span> Relational Data aka joins</a>
-<ul>
-<li><a href="#inner-join"><span class="toc-section-number">2.2.1</span> Inner join</a></li>
-<li><a href="#outer-joins"><span class="toc-section-number">2.2.2</span> Outer joins</a></li>
 </ul></li>
-<li><a href="#tidy-data"><span class="toc-section-number">2.3</span> Tidy data</a>
+<li><a href="#relational-data-aka-joins"><span class="toc-section-number">3</span> Relational Data aka joins</a>
 <ul>
-<li><a href="#make-the-tidy-data-for-the-next-session"><span class="toc-section-number">2.3.1</span> Make the tidy data for the next session</a></li>
+<li><a href="#inner-join"><span class="toc-section-number">3.0.1</span> Inner join</a></li>
+<li><a href="#outer-joins"><span class="toc-section-number">3.0.2</span> Outer joins</a></li>
 </ul></li>
+<li><a href="#tidy-data"><span class="toc-section-number">4</span> Tidy data</a>
+<ul>
+<li><a href="#make-the-tidy-data-for-the-next-session"><span class="toc-section-number">4.0.1</span> Make the tidy data for the next session</a></li>
 </ul></li>
 </ul>
 </div>
@@ -476,8 +476,9 @@ lizards_small %&gt;% arrange(-total_length)
 ## # ... with 111 more rows</code></pre>
 </div>
 </div>
-<div id="relational-data-aka-joins" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Relational Data aka joins</h2>
+</div>
+<div id="relational-data-aka-joins" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Relational Data aka joins</h1>
 <p>Chapter 13 from <em><a href="https://r4ds.had.co.nz/">R for Data Science</a></em> covers relational data:</p>
 <blockquote>
 <p>It’s rare that a data analysis involves only a single table of data. Typically you have many tables of data, and you must combine them to answer the questions that you’re interested in. Collectively, multiple tables of data are called relational data because it is the relations, not just the individual datasets, that are important.</p>
@@ -507,8 +508,8 @@ glimpse(npp)
 ## $ zone     &lt;fct&gt; C, C, C, G, G, G, M, M, M, P, P, P, T, T, T, C, C, C, G, G, G~
 ## $ site     &lt;fct&gt; CALI, GRAV, SAND, BASN, IBPE, SUMM, NORT, RABB, WELL, COLL, S~
 ## $ npp_g_m2 &lt;dbl&gt; 28.6, 85.7, 103.3, 77.2, 34.1, 53.7, 57.9, 106.1, 79.8, 136.0~</code></pre>
-<div id="inner-join" class="section level3" number="2.2.1">
-<h3><span class="header-section-number">2.2.1</span> Inner join</h3>
+<div id="inner-join" class="section level3" number="3.0.1">
+<h3><span class="header-section-number">3.0.1</span> Inner join</h3>
 <p>The simplest join which matches pairs of observation whenever keys are equal.</p>
 <p>zone and site apear in each dataframe - but wouldn’t date or year be useful to include too?</p>
 <pre class="r"><code>lizards_small &lt;-  lizards_small %&gt;% mutate(year = year(date))</code></pre>
@@ -529,8 +530,8 @@ glimpse(npp)
 ## 10 1990-01-04 M     WELL  UKLI  &lt;NA&gt;            NA     NA  1990     79.8
 ## # ... with 3,660 more rows</code></pre>
 </div>
-<div id="outer-joins" class="section level3" number="2.2.2">
-<h3><span class="header-section-number">2.2.2</span> Outer joins</h3>
+<div id="outer-joins" class="section level3" number="3.0.2">
+<h3><span class="header-section-number">3.0.2</span> Outer joins</h3>
 <p>A <code>left_join()</code> keeps the observations in the left (x argument) dataframe.</p>
 <pre class="r"><code>left_join(lizards_small, npp, by = c(&#39;year&#39;, &#39;zone&#39;, &#39;site&#39;))
 ## # A tibble: 4,091 x 9
@@ -581,8 +582,8 @@ glimpse(npp)
 ## # ... with 4,339 more rows</code></pre>
 </div>
 </div>
-<div id="tidy-data" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Tidy data</h2>
+<div id="tidy-data" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Tidy data</h1>
 <p>Tidy data makes it easy to transform and analyse data in R (and many other tools). Tidy data has observations in rows, and variables in columns. The whole Tidyverse is designed to work with tidy data.</p>
 <p>Often, a dataset is organised in a way that makes it easy for humans to read and populate. This is usually called “wide format”. Tidy data is <em>usually</em> in “long” format.</p>
 <p>The ultimate rules of tidy data are:</p>
@@ -595,8 +596,8 @@ glimpse(npp)
 <blockquote>
 <p>To learn more about Tidy Data, you can read <a href="https://www.jstatsoft.org/index.php/jss/article/view/v059i10/v59i10.pdf">Hadley Wickham’s 2014 article on the topic</a>.</p>
 </blockquote>
-<div id="make-the-tidy-data-for-the-next-session" class="section level3" number="2.3.1">
-<h3><span class="header-section-number">2.3.1</span> Make the tidy data for the next session</h3>
+<div id="make-the-tidy-data-for-the-next-session" class="section level3" number="4.0.1">
+<h3><span class="header-section-number">4.0.1</span> Make the tidy data for the next session</h3>
 <p>Need to add the scientific and common name to our lizard dataset from the codelist file.</p>
 <pre class="r"><code>code &lt;- read_table(&quot;data/lizardcodelist.txt&quot;, skip = 1)
 ## Warning: Duplicated column names deduplicated: &#39;NAME&#39; =&gt; &#39;NAME_1&#39; [5]
@@ -670,6 +671,5 @@ left_join(lizards, code, by = &#39;spp&#39;) %&gt;%
 ## 10 1989-~ cnemidophorus t~ western wh~ g     basn  b     10    cnti  m     n    
 ## # ... with 4,081 more rows, and 6 more variables: toe_num &lt;chr&gt;,
 ## #   SV_length &lt;chr&gt;, total_length &lt;chr&gt;, weight &lt;chr&gt;, tail &lt;chr&gt;, pc &lt;chr&gt;</code></pre>
-</div>
 </div>
 </div>
