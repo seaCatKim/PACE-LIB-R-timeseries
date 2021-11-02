@@ -1,5 +1,6 @@
 ---
 title: "Day 1.1 Data manipulation"
+subtitle: "Centre for Biodiversity and Conservation Science + Library R workshop"
 author: "Catherine Kim"
 date: "`r Sys.Date()`"
 categories: ["R"]
@@ -11,10 +12,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE)
+knitr::opts_chunk$set(collapse = TRUE, warnings = FALSE)
 ```
-
-# Centre for Biodiversity and Conservation Science + Library R workshop
 
 # Day1
 
@@ -48,8 +47,19 @@ Specifically, you will learn how to **explore, filter, reorganise and process** 
 * `mutate()`: create new variables
 * `summarise()`: collapse to a single summary
 * `group_by()`: change the scope of function
+* `joins`: combine dataframes based on a common variable
+* `pivots`: transform dataframes into long and wide formats
 
-## Lizard size measurement data
+## Load packages
+
+```{r packages, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+```
+
+## Read in the data
+
+### Lizard size measurement data
 
 Our data sets are a curated subset from [Jornada Basin Long Term Ecological Research site](https://lter.jornada.nmsu.edu/) in New Mexico, part of the US Long Term Ecological Research (LTER) network: 
 
@@ -57,34 +67,261 @@ Our data sets are a curated subset from [Jornada Basin Long Term Ecological Rese
 
 From the data package: "This data package contains data on lizards sampled by pitfall traps located at 11 consumer plots at Jornada Basin LTER site from 1989-2006. The objective of this study is to observe how shifts in vegetation resulting from desertification processes in the Chihuahaun desert have changed the spatial and temporal availability of resources for consumers. Desertification changes in the Jornada Basin include changes from grass to shrub dominated communities and major soil changes. If grassland systems respond to rainfall without significant lags, but shrub systems do not, then consumer species should reflect these differences. In addition, shifts from grassland to shrubland results in greater structural heterogeneity of the habitats. We hypothesized that consumer populations, diversity, and densities of some consumers will be higher in grasslands than in shrublands and will be related to the NPP of the sites. Lizards were captured in pitfall traps at the 11 LTER II/III consumer plots (a subset of NPP plots) quarterly for 2 weeks per quarter. Variables measured include species, sex, recapture status, snout-vent length, total length, weight, and whether tail is broken or whole. This study is complete." 
 
-## Annual mean estimates net primary production (NPP)
+There are 16 total variables in the lizards.csv data we'll read in. The ones we'll use in this workshop are:
+
+* `date`: data collection date
+* `scientific_name`: lizard scientific name
+* `common_name`: lizard common name
+* `site`: research site code
+* `sex`: lizard sex (m = male; f = female; j = juvenile)
+* `sv_length`: snout-vent length (millimeters)
+* `total_length`: body length (millimeters)
+* `toe_num`: toe mark number
+* `weight`: body weight (grams)
+* `tail`: tail condition (b = broken; w = whole)
+
+```{r read lizards, message=FALSE}
+lizards <- read_csv("data/jornada_lizards.csv", trim_ws = TRUE) %>% 
+  mutate(date = as.Date(date, format = '%m/%d/%y')) %>% 
+  mutate_if(is.character, as.factor)
+glimpse(lizards)
+
+class(lizards)
+```
+
+```{r read lizard codelist, message=FALSE}
+code <- read_table("data/lizardcodelist.txt", skip = 1)
+code <-  code[-1,]
+
+glimpse(code)
+```
+
+### Annual mean estimates net primary production (NPP)
 
 - Peters, D. and L. Huenneke. 2020. Annual mean estimates of aboveground net primary production (NPP) at 15 sites at Jornada Basin LTER, 1989-ongoing ver 104. Environmental Data Initiative. https://doi.org/10.6073/pasta/18dad6748af96c98b72cea3436bf7fe4 (Accessed 2021-11-02).
 
 From the data package: "This package contains values of mean annual aboveground net primary production (NPP, in grams per square meter per year) at 15 NPP study sites on Jornada Experimental Range (JER) and Chihuahuan Desert Rangeland Research Center (CDRRC) lands. Sites were selected to represent the 5 major ecosystem types in the Chihuahuan Desert (upland grasslands, playa grasslands, mesquite-dominated shrublands, creosotebush-dominated shrublands, tarbush-dominated shrublands)."
 
-## Load packages
-
-```{r packages, warning=TRUE}
-library(tidyverse)
-```
-
-## Read in the data
-
-```{r read lizards, message=FALSE}
-lizards <- read_csv("data/jornada_lizards.csv")
-glimpse(lizards)
-```
-
-```{r read lizard codelist, message=FALSE}
-code <- read_table("data/lizardcodelist.txt", skip = 1)
-glimpse(code)
-```
-
 ```{r read NPP, message=FALSE}
 npp <- read_csv("data/jornada_npp.csv") %>% 
   mutate_if(is.character, as.factor)
 glimpse(npp)
+```
+
+# Basic dplyr verbs
+
+The R package `dplyr` was developed by Hadley Wickham for data manipulation.
+
+The book _[R for Data Science](https://r4ds.had.co.nz/)_ introduces the package as follows:
+
+> You are going to learn the five key dplyr functions that allow you to solve the vast majority of your data manipulation challenges:
+> 
+> * Pick variables by their names with `select()`
+> * Pick observations by their values with `filter()`
+> * Reorder the rows with `arrange()`
+> * Create new variables with functions of existing variables with `mutate()`
+> * Collapse many values down to a single summary with `summarise()`
+> 
+> These can all be used in conjunction with `group_by()` which changes the scope of each function from operating on the entire dataset to operating on it group-by-group. These six functions provide the main **verbs for a language of data manipulation**.
+
+### The pipe operator
+
+We can make our code more readable and avoid creating useless intermediate objects by **piping** commands into each other. The pipe operator `%>%` **strings commands together**, using the left side's output as the first argument of the right side function.
+
+For example, this command:
+
+```{r}
+round(1.23, digits = 1)
+```
+
+... is equivalent to:
+
+```{r}
+1.23 %>% round(digits = 1)
+```
+
+The pipe operator can be read as "then" and makes the code a lot **more readable** than when nesting functions into each other, and avoids the creation of several intermediate objects. It is also easier to trouble shoot as it makes it easy to execute the pipeline step by step.
+
+> Note that this material uses the `magrittr` pipe. The `magrittr` package is the one that introduced the pipe operator to the R world, and `dplyr` automatically imports this useful operator when it is loaded. However, the pipe being such a widespread and popular concept in programming and data science, it ended up making it into Base R (the "native" pipe) in 2021 with the release of R 4.1, using a different operator: `|>`. You can switch your pipe shortcut to the native pipe in `Tools > Global options > Code > Use native pipe operator`.
+
+## 1. Pick variables with `select()`
+
+`select()` allows us to pick variables (i.e. columns) from the dataset. For example, to only keep the data about year, site, spp, sex, total_length, and weight:
+
+> The columns are reordered in the order they are listed and columns can also be renamed.
+
+```{r select}
+lizards %>% 
+  select(date, zone, site, spp, sex, total_length, weight) -> lizards_small
+lizards %>% 
+  select(date, zone, site, spp, sex, length = total_length, weight)
+```
+
+There are several ways to select columns.
+
+1. list the column names
+2. list column numbers
+3. use minus (-) notation to remove columns
+4. a range using the ':'
+
+```{r ways to select}
+lizards %>% select(1,2,3)
+lizards %>% select(-date)
+lizards %>% select(5:9)
+lizards %>% select(-(date:zone))
+```
+
+### 2. Pick observations with `filter()`
+
+The `filter()` function allows use to pick observations depending on one or several conditions. But to be able to define these conditions, we need to learn about logical operators.
+
+**Logical operators** allow us to **compare things**. Here are some of the most important ones:
+
+* `==`: equal
+* `!=`: different or not equal
+* `>`: greater than
+* `<`: smaller than
+* `>=`: greater or equal
+* `<=`: smaller or equal
+
+> Remember: `=` is used to pass on a value to an argument, whereas `==` is used to check for equality. Using `=` instead of `==` for a logical statment is one of the most common errors and R will give you a reminder in the console when this happens.
+
+Filter lizard observations since 2000. There are also a lot of rows with NAs, can we filter those out too?
+
+```{r filter by date}
+range(lizards$date)
+lizards_small %>% 
+  filter(date >= '2000-01-01', sex != 'NA') # remove rows with NAs
+```
+
+Filter using the or '|'.
+
+```{r filter using or}
+lizards_small %>% 
+  filter(site == 'RABB' | site == 'GRAV')
+```
+
+### 3. Reorder observations with `arrange()`
+
+`arrange()` will reorder our rows according to a variable, by default in ascending order:
+
+When/where was the biggest (total_length) lizard caught?
+
+```{r arrange total length}
+range(lizards_small$total_length, na.rm = TRUE)
+lizards_small %>% arrange(total_length) 
+lizards_small %>% arrange(desc(total_length))
+lizards_small %>% arrange(-total_length)
+```
+
+### 4. Create new variables with `mutate()`
+
+We did some mutating when reading in our data at the start to convert columns to different data types.
+
+`mutate()` is very versatile and useful! Few other uses include combining with `ifelse()` conditionals and transforming columns. 
+
+```{r mutate}
+lizards_small %>% mutate(weight_kg = weight / 1000)
+```
+
+###  5. Collapse to a single value with `summarise()`
+
+`summarise()` collapses many values down to a single summary. For example, to find the mean weight for the whole dataset:
+
+```{r mean wegith}
+lizards_small %>%
+  summarise(meanW = mean(weight, na.rm = TRUE))
+```
+
+However, a single-value summary is not particularly interesting. `summarise()` becomes more powerful when used with `group_by()`.
+
+### 6. Change the scope with `group_by()`
+
+`group_by()` changes the scope of the following function(s) from operating on the entire dataset to operating on it group-by-group.
+
+See the effect of the grouping step (in the console):
+
+```{r groupby}
+lizards_small %>%
+  group_by(spp) 
+```
+
+Summarize by year, site, and species for mean weight. Calculate standard deviation and standard error.
+
+```{r summarize and group}
+lizards_small %>%
+  group_by(year, site, spp) %>% 
+  summarize(meanW = mean(weight, na.rm = TRUE),
+            SD = sd(weight),
+            SE = SD/sqrt(n()),
+            n())
+```
+
+## Relational Data aka joins
+
+Chapter 13 from _[R for Data Science](https://r4ds.had.co.nz/)_ covers relational data:
+
+> It’s rare that a data analysis involves only a single table of data. Typically you have many tables of data, and you must combine them to answer the questions that you’re interested in. Collectively, multiple tables of data are called relational data because it is the relations, not just the individual datasets, that are important.
+
+Joins stem from database concepts and there is a lot you can read about them. Here we will focus on the main inner and outer joins.
+
+![diagram of different types of joins](/./pics/joins.png)
+
+Let's say we were interested in seeing if net primary productivity (NPP) had any influence over the length/weights of our lizards over time. The very first step would be to *join* our lizard data and NPP data into one dataframe so we could do some analysis.
+
+A *key* is the variable used to connect each pair of variables.
+
+Let's have a look at the variables of our two dataframes we are interested in joining:
+
+```{r glimpse}
+glimpse(lizards_small)
+glimpse(npp)
+```
+
+### Inner join
+
+The simplest join which matches pairs of observation whenever keys are equal. 
+
+zone and site apear in each dataframe - but wouldn't date or year be useful to include too?
+
+```{r year}
+lizards_small <-  lizards_small %>% mutate(year = year(date))
+```
+
+Now let's join using year, zone, and site:
+
+```{r inner}
+inner_join(lizards_small, npp, by = c('year', 'zone', 'site'))
+```
+
+### Outer joins
+
+A `left_join()` keeps the observations in the left (x argument) dataframe.
+
+```{r left}
+left_join(lizards_small, npp, by = c('year', 'zone', 'site'))
+```
+
+A `right_join()` keeps the observation in the right (y argument) dataframe.
+
+```{r right}
+right_join(lizards_small, npp, by = c('year', 'zone', 'site'))
+```
+
+And a `full_join()` keeps all observation from both dataframes.
+
+```{r}
+full_join(lizards_small, npp, by = c('year', 'zone', 'site'))
+```
+
+
+# Make the tidy data for the next session
+
+```{r rename code}
+code <- code %>% 
+  mutate(scientific_name = paste(SCIENTIFIC, NAME, sep = " "),
+         common_name = paste(COMMON, NAME_1, sep = " ")) %>% 
+  select(-(SCIENTIFIC:NAME_1))
 ```
 
 # Including Plots
