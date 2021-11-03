@@ -123,6 +123,8 @@ glimpse(lizards)
 ## $ weight       <dbl> 26, 6, 24, 25, 24, 22, 3, 9, 16, 9, 16, 21, NA, 19, 26, 1~
 ## $ tail         <fct> B, B, W, W, B, W, B, W, W, W, W, W, NA, W, B, W, NA, W, B~
 ## $ pc           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+# to read the code in from github use the following:
+# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/jornada_lizards.csv") 
 class(lizards)
 ## [1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame"
 ```
@@ -653,7 +655,8 @@ Need to add the scientific and common name to our lizard dataset from the codeli
 
 
 ```r
-code <- read_table("data/lizardcodelist.txt", skip = 1)
+code <- read_table("data/lizardcodelist.txt", skip = 1) %>% # remove the first descriptive line in text file
+  slice(-1) # remove 1st line of -------
 ## Warning: Duplicated column names deduplicated: 'NAME' => 'NAME_1' [5]
 ## Warning: 17 parsing failures.
 ## row col  expected    actual                      file
@@ -664,7 +667,8 @@ code <- read_table("data/lizardcodelist.txt", skip = 1)
 ##   5  -- 5 columns 6 columns 'data/lizardcodelist.txt'
 ## ... ... ......... ......... .........................
 ## See problems(...) for more details.
-code <-  code[-1,]
+# to read the code in from github use the following:
+# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/lizardcodelist.txt") %>% slice(-1)
 
 glimpse(code)
 ## Rows: 19
