@@ -9,6 +9,7 @@ output: html_document
 
 ## Day 2 Automating workflows
 
+
 Day is about learning different R skills to automate and improve your coding.
 
 ![](https://media.giphy.com/media/f6hnhHkks8bk4jwjh3/giphy.gif)
