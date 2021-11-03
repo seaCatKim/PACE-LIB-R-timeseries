@@ -1,13 +1,12 @@
 ---
 title: "Day 1.2 Data visualization"
 subtitle: "Customized Data Visualization in `ggplot2`"
-date: '2021-11-02'
+date: '2021-11-03'
 output: 
-  blogdown::html_page:
+    blogdown::html_page:
     df_print: tibble
     toc: true
     number_sections: TRUE
-  
 ---
 
 **Caitie Kuempel, PhD**
