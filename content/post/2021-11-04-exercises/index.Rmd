@@ -5,17 +5,10 @@ author: "Manuela M"
 date: "2021-11-04"
 slug: day2-exercises
 output:
-  html_document:
-    highlight: pygments
-    number_sections: no
-    theme: cerulean
-    fig_caption: yes
-    toc: yes
-    toc_depth: 4
-    toc_float: 
-      smooth_scroll: no
-      toc_collapsed: no
-always_allow_html: true
+  blogdown::html_page:
+    df_print: tibble
+    toc: true
+    number_sections: TRUE
 ---
 
 ```{r setup, include=FALSE}

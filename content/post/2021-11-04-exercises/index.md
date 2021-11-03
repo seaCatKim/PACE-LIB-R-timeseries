@@ -5,17 +5,10 @@ author: "Manuela M"
 date: "2021-11-04"
 slug: day2-exercises
 output:
-  html_document:
-    highlight: pygments
-    number_sections: no
-    theme: cerulean
-    fig_caption: yes
-    toc: yes
-    toc_depth: 4
-    toc_float: 
-      smooth_scroll: no
-      toc_collapsed: no
-always_allow_html: true
+  blogdown::html_page:
+    df_print: tibble
+    toc: true
+    number_sections: TRUE
 ---
 <script src="{{< blogdown/postref >}}index_files/kePrint/kePrint.js"></script>
 <link href="{{< blogdown/postref >}}index_files/lightable/lightable.css" rel="stylesheet" />
@@ -108,13 +101,15 @@ head(blackdrum)
 ```
 
 ```
-##   year agid     spname month day weight     tl     sex otoage
-## 1 2001    1 Black Drum     4  30  15.74  787.5    male      6
-## 2 2001    2 Black Drum     5   2  12.40  700.0    male      5
-## 3 2001    3 Black Drum     5   3  74.00 1295.0  female     61
-## 4 2001    4 Black Drum     5   3  47.00 1035.0  female     15
-## 5 2001    5 Black Drum     5  10     NA 1205.0 unknown     33
-## 6 2001    6 Black Drum     5  10     NA 1155.0  female     19
+## # A tibble: 6 x 9
+##    year  agid spname     month   day weight    tl sex     otoage
+##   <int> <int> <chr>      <int> <int>  <dbl> <dbl> <chr>    <int>
+## 1  2001     1 Black Drum     4    30   15.7  788. male         6
+## 2  2001     2 Black Drum     5     2   12.4  700  male         5
+## 3  2001     3 Black Drum     5     3   74   1295  female      61
+## 4  2001     4 Black Drum     5     3   47   1035  female      15
+## 5  2001     5 Black Drum     5    10   NA   1205  unknown     33
+## 6  2001     6 Black Drum     5    10   NA   1155  female      19
 ```
 
 The VBGM, as well as most other growth models, is a non-linear model that requires non-linear statistical methods to estimate parameter values. One option is using minimum least squares. In R, there is a function called `optim` which minimises a function by varying its parameters. Create a function to compute the residual sum of squares of the data against the model, and use it in combination with `optim()` to obtain estimates of `\((L_{\infty}, K, t_0)\)`.
