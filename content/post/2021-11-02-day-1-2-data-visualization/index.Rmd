@@ -875,7 +875,7 @@ jornada_veg <- read_sf("spatial_vegetation/doc.kml") %>% dplyr::select(Name) %>%
 # View(palettes_d_names)
 ggplot() +
   geom_sf(data = jornada_veg, 
-          aes(fill = Name),
+          aes(fill = name),
           color = NA) 
 # For next year: how would you change increments of lat / lon on x & y axis? See coord_map()
 ```
@@ -883,7 +883,7 @@ ggplot() +
 ```{r}
 ggplot() +
   geom_sf(data = jornada_veg, 
-          aes(fill = Name),
+          aes(fill = name),
           color = NA) +
   theme_minimal() +
   scale_fill_paletteer_d(palette = "ggthemes::manyeys") +
