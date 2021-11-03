@@ -95,6 +95,8 @@ lizards <- read_csv("data/jornada_lizards.csv", trim_ws = TRUE) %>%
   mutate_if(is.character, as.factor)
 glimpse(lizards)
 
+# to read the code in from github use the following:
+# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/jornada_lizards.csv") 
 class(lizards)
 ```
 
@@ -336,8 +338,11 @@ Is the lizards dataset tidy?
 Need to add the scientific and common name to our lizard dataset from the codelist file.
 
 ```{r read lizard codelist, message=FALSE}
-code <- read_table("data/lizardcodelist.txt", skip = 1)
-code <-  code[-1,]
+code <- read_table("data/lizardcodelist.txt", skip = 1) %>% # remove the first descriptive line in text file
+  slice(-1) # remove 1st line of -------
+
+# to read the code in from github use the following:
+# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/lizardcodelist.txt") %>% slice(-1)
 
 glimpse(code)
 ```
