@@ -1,8 +1,8 @@
 ---
-title: "R Programming Training Workshop"
-subtitle: "Exercises (Day 2)"
+title: "Day 2 Exercises"
+subtitle: "R Programming Training Workshop"
 author: "Manuela M"
-date: "`r format(Sys.time(), '%d/%m/%Y')`"
+date: "2021-11-04"
 slug: day2-exercises
 output:
   html_document:
