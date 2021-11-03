@@ -2,7 +2,7 @@
 title: "Day 1.1 Data manipulation"
 subtitle: "Centre for Biodiversity and Conservation Science + Library R workshop"
 author: "Catherine Kim"
-date: "2021-11-02"
+date: "2021-11-03"
 categories: ["R"]
 tags: ["dplyr"]
 output:
