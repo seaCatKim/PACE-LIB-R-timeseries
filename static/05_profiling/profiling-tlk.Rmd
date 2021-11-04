@@ -1,0 +1,331 @@
+---
+title: "Profiling R code"
+author: "Manuela Mendiolar"
+date: "01/11/2021"
+output: 
+  ioslides_presentation:
+    widescreen: true
+  editor_options: 
+  markdown: 
+    wrap: 72
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## A good programming practice typically proceeds in the following steps:
+
+-   making the code run (debugging)
+-   making the code right
+-   profiling the code
+-   making the code fast <br /> <br />
+
+Keep in mind that...
+
+*Premature optimization is the root of all evil* <br /> Donald Knuth
+
+
+## Profiling R code
+
+Profiling is a systematic way to measure how much time is spent in each part of a program, which is often necessary for complex projects and/or handling big data. Once the profiling procedure successfully detect the bottlenecks in a code (i.e., the parts running slowly), one can move on to think about how to optimize the code and improve its performance. R has a built-in profiler to help a programmer speed up his/her code.
+
+
+## Profiling vs Benchmarking
+
+Profiling
+
+* If you’ve decided you need your code to perform better, **profile first**.
+* Profiling helps isolate hot spots.
+* Time spent here will likely yield best return on your investment (usually time).
+
+Benchmarking
+
+* With hot spots in hand, examine the code and propose alternatives.
+* While ensuring the results are the same, ask which performs best.
+
+
+## R profiling tools
+
+R has builtin support for profiling, but there are additional packages available:
+
+* <p style="font-family: consolas"> proftools </p>
+* <p style="font-family: consolas"> profvis </p> (RStudio integration)
+
+
+## Basic profiling with proftools 
+```{r, echo=TRUE}
+f <- function(a) { g1(a) + g2(2 * a) }
+
+g1 <- function(a) { h(a) }
+
+g2 <- function(a) { sqrt(a) }
+
+h <- function(a) {
+  b <- double(length(a))
+  for (i in seq_along(a)) {
+    b[i] <- sqrt(a[i])
+  }
+  b
+}
+```
+
+
+## Basic profiling with proftools 
+```{r, echo=FALSE}
+f <- function(a) { g1(a) + g2(2 * a) }
+
+g1 <- function(a) { h(a) }
+
+g2 <- function(a) { sqrt(a) }
+
+h <- function(a) {
+  b <- double(length(a))
+  for (i in seq_along(a)) {
+    b[i] <- sqrt(a[i])
+  }
+  b
+}
+```
+
+```{r, echo=TRUE}
+x <- 1:1000000
+Rprof('prof.out')
+for (i in 1:10) {
+  y <- f(x)
+}
+Rprof(NULL)
+summaryRprof("prof.out")$by.self
+```
+
+
+## Basic profiling with profvis
+Can also do this in RStudio, e.g. Profile -> Start Profile
+```{r, echo=TRUE}
+library(profvis)
+profvis({
+for (i in 1:10) {
+  y <- f(x)
+}
+})
+```
+
+
+## Benchmarking
+Knowing where code is slow via profiling, use benchmarking tools.
+
+* Put problem code into a functions.
+* Benchmark different versions of code for comparison.
+* system.time is useful for long running code.
+* microbenchmark package is useful for analyzing short running code.
+
+## system.time()
+
+The system.time() function takes an arbitrary R expression as input (can
+be wrapped in curly braces) and computes the time (in seconds) needed to
+execute the expression, and if there's an error, gives the time until
+the error occurred.
+
+```{r, echo=TRUE}
+r <- 100
+system.time({while (r < 200 && r >= 1) {
+  dr <- rbinom(1, 1, .5)
+  if (dr == 1) {r <- r + 1} 
+  else {r <- r -1}}})
+```
+
+
+## Are for loops in R slow?
+* Not all for loops are bad
+* Most common mistakes involve for loops.
+* The classic mistake is not preallocating a result vector.
+
+
+## Example
+Create a vector of length n where all values are x
+
+
+## Example 1: a bad for-loop
+```{r, echo=TRUE}
+bad.for <- function(n,x) {
+  result <- NULL
+  for (i in 1:n) {
+    result[i] <- x
+  }
+  result
+}
+```
+* Large number of iterations
+* Tiny amount of computation per iteration
+* Item result vector is reallocated and copied on each iteration
+* Triggering garbage collection periodically
+
+
+## Example 1: a better for-loop
+```{r, echo=TRUE}
+okay.for <- function(n,x) {
+  result <- double(n)
+  for (i in 1:n) {
+    result[i] <- x
+  }
+  result
+}
+```
+Improvement over the previous example, but it’s still slow because of the many tiny iterations.
+
+
+## Example 1: a puzzle loop
+```{r, echo=TRUE}
+strange.for <- function(n, x) {
+  result <- NULL
+  for (i in n:1) {
+    result[i] <- x
+  }
+  result
+}
+```
+Is this loop faster or slower than the previous two?
+
+
+## Example 1: using a vector function
+```{r, echo=TRUE}
+# use of vector assignment
+vector.assn <- function(n, x) {
+  result <- double(n)
+  result[] <- x
+  result
+}
+```
+We can also use vector assignment
+
+## Example 1: using R built-in function
+```{r, echo=TRUE}
+built.in <- function(n, x) {
+  rep(x, n)
+}
+```
+Or, we could read the fine manual and use a built-in function
+
+
+## Example 1: testing
+Make sure functions produce identical output
+```{r, echo=TRUE}
+n <- 10000
+x <- 7
+bad.result        <- bad.for(n, x)
+okay.result       <- okay.for(n, x)
+strange.result    <- strange.for(n, x)
+vector.result     <- vector.assn(n, x)
+built.result      <- built.in(n, x)
+c(identical(bad.result, okay.result),
+identical(bad.result, strange.result),
+identical(bad.result, vector.result),
+identical(bad.result, built.result))
+```
+
+
+## Example 1: benchmark results{.smaller}
+```{r, echo=TRUE}
+library("microbenchmark")
+library(knitr)
+res <- microbenchmark(bad=bad.for(n,x), okay=okay.for(n,x), strange=strange.for(n,x),
+                      vector=vector.assn(n,x), builtin=built.in(n,x))
+kable(summary(res, unit="relative"))
+```
+
+
+## Example 1: benchmark plot
+```{r, echo=TRUE, message=FALSE}
+library(ggplot2)
+autoplot(res)
+```
+
+
+<!-- ## Example 2 -->
+<!-- Create a matrix with n rows and x columns. -->
+
+<!-- Each value in the matrix is sampled from normal distribution, $\mu = 0$, $\sigma = 1$ -->
+
+
+<!-- ## Example 2: another bad for-loop -->
+<!-- ```{r, echo=TRUE} -->
+<!-- bad.norm <- function(n,x) { -->
+<!--   m <- NULL -->
+<!--   for (i in 1:n) { -->
+<!--     m <- rbind(m, rnorm(x)) -->
+<!--   } -->
+<!--   m -->
+<!-- } -->
+<!-- ``` -->
+
+
+<!-- ## Example 2: pre-allocation of result vector -->
+<!-- ```{r, echo=TRUE} -->
+<!-- ok.norm <- function(n,x) { -->
+<!--   m <- matrix(0, nrow=n, ncol=x) -->
+<!--   for (i in 1:n) { -->
+<!--     m[i,] <- rnorm(100) -->
+<!--   } -->
+<!--   m -->
+<!-- } -->
+<!-- ``` -->
+
+
+<!-- ## Example 2: use lapply and rbind -->
+<!-- ```{r, echo=TRUE} -->
+<!-- lapply.norm <- function(n,x) { -->
+<!--   do.call('rbind', lapply(1:n, function(i) rnorm(x))) -->
+<!-- } -->
+<!-- ``` -->
+<!-- No need to pre-allocate. -->
+
+
+<!-- ## Example 2: Compute all rows at once -->
+<!-- ```{r, echo=TRUE} -->
+<!-- best.norm <- function(n,x) { -->
+<!--   m <- rnorm(x * n) -->
+<!--   dim(m) <- c(x, n) -->
+<!--   t(m) -->
+<!-- } -->
+<!-- ``` -->
+
+
+<!-- ## Example 2: testing -->
+<!-- Make sure functions produce identical output -->
+<!-- ```{r, echo=TRUE} -->
+<!-- n <- 600 -->
+<!-- x <- 100 -->
+<!-- # Verify correct results -->
+<!-- set.seed(123); bad.result <- bad.norm(n,x) -->
+<!-- set.seed(123); ok.result <- ok.norm(n,x) -->
+<!-- set.seed(123); lapply.result <- lapply.norm(n,x) -->
+<!-- set.seed(123); best.result <- best.norm(n,x) -->
+
+<!-- c(identical(bad.result, ok.result), -->
+<!-- identical(bad.result, lapply.result), -->
+<!-- identical(bad.result, best.result)) -->
+<!-- ``` -->
+
+
+<!-- ## Example 2: benchmark results{.smaller} -->
+<!-- ```{r, echo=TRUE} -->
+<!-- library("microbenchmark") -->
+<!-- library(knitr) -->
+<!-- res <- microbenchmark(bad=bad.norm(n,x), ok=ok.norm(n,x), -->
+<!--                         lapply=lapply.norm(n,x), best=best.norm(n,x)) -->
+<!-- kable(summary(res, unit="relative")) -->
+<!-- ``` -->
+
+
+<!-- ## Example 2: benchmark plot -->
+<!-- ```{r, echo=TRUE, message=FALSE} -->
+<!-- library(ggplot2) -->
+<!-- autoplot(res) -->
+<!-- ``` -->
+
+
+## Further reading
+
+[Optimising code](adv-r.had.co.nz/Profiling) by Hadley Wickham
+
