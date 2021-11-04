@@ -101,7 +101,7 @@ head(blackdrum)
 ```
 
 ```
-## # A tibble: 6 × 9
+## # A tibble: 6 x 9
 ##    year  agid spname     month   day weight    tl sex     otoage
 ##   <int> <int> <chr>      <int> <int>  <dbl> <dbl> <chr>    <int>
 ## 1  2001     1 Black Drum     4    30   15.7  788. male         6
@@ -153,6 +153,10 @@ fahr_to_kelvin <- function(temp_F) {
 ```r
 library(tidyverse)
 library(palmerpenguins)
+```
+
+```
+## Warning: package 'palmerpenguins' was built under R version 4.0.5
 ```
 
 -   Create a plot from the data (whatever type you want). Here is some information about the [data](https://allisonhorst.github.io/palmerpenguins/).
