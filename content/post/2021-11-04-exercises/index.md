@@ -86,9 +86,9 @@ Don't forget to document (describing what the function does) and test.
 
 The Von Bertalanffy Growth Model (VBGM) describes the body growth in length of most fish, i.e.
 
-$$ L_t = L_{\infty} \left[ 1 - e^{-K(t-t_0)} \right] \\$$ where `\(L_t\)` is the body length at age `\(t\)`, `\(L_{\infty}\)` is the asymptotic or theoretical maximum length, `\(K\)` is the growth coefficient, and `\(t_0\)` is the theoretical age when length equals zero.
+`\(L_t = L_{\infty} \left[ 1 - e^{-K(t-t_0)} \right]\)` where `\(L_t\)` is the body length at age `\(t\)`, `\(L_{\infty}\)` is the asymptotic or theoretical maximum length, `\(K\)` is the growth coefficient, and `\(t_0\)` is the theoretical age when length equals zero.
 
--   Write a function that returns the length given a specific age and a set of parameters `\((L_{\infty}, K, t_0)\)`.
+-   Write a function that returns the length given a specific age and a set of parameters `\((L_{\infty}, K, t_0)\)`
 
 -   Next we will be working with biological data for Black Drum from Virginia waters of the Atlantic Ocean ([view](https://github.com/droglenc/FSAdata/blob/master/data-raw/BlackDrum2001.csv), [download](https://raw.githubusercontent.com/droglenc/FSAdata/master/data-raw/BlackDrum2001.csv), [meta-data](http://derekogle.com/fishR/data/data-html/BlackDrum2001.html)). Download the data and save it as a .csv with the name `BlackDrum2001.csv`. The data should look like:
 
@@ -101,7 +101,7 @@ head(blackdrum)
 ```
 
 ```
-## # A tibble: 6 x 9
+## # A tibble: 6 × 9
 ##    year  agid spname     month   day weight    tl sex     otoage
 ##   <int> <int> <chr>      <int> <int>  <dbl> <dbl> <chr>    <int>
 ## 1  2001     1 Black Drum     4    30   15.7  788. male         6
@@ -153,10 +153,6 @@ fahr_to_kelvin <- function(temp_F) {
 ```r
 library(tidyverse)
 library(palmerpenguins)
-```
-
-```
-## Warning: package 'palmerpenguins' was built under R version 4.0.5
 ```
 
 -   Create a plot from the data (whatever type you want). Here is some information about the [data](https://allisonhorst.github.io/palmerpenguins/).
