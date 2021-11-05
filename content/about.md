@@ -26,3 +26,11 @@ PhD Student, School of Maths and Physics, CBCS <br>
 <img src="/./about_files/matt_pic.jpg" alt="headshot Matt Holden outside" width="200px" height="200px"/><br>
 Matthew Hodlen <br>
 Lecturer, School of Maths and Physics, CBCS<br>
+
+# Contact
+
+Are you a member of the UQ community that is interested in a training workshop through the Library? 
+
+Contact the training team at: library dot uq dot edu dot au
+
+CBCS can be contacted at: cbcs-info at uq dot edu dot au
