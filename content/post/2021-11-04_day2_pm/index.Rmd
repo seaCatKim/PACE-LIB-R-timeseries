@@ -25,4 +25,4 @@ Topics are as follows: *(suggest opening presentation slides 'in new window')*
 * [Profiling](/05_profiling/profiling-tlk.html)
 * [Parallel processing](/06_parallel/parallel-tlk.html)
 
-[Exercises for the whole day - solutions to be incorporated shortly](/2021/11/04/day2-exercises/)
+[Exercises for the whole day. (Solutions to be incorporated shortly.)](/2021/11/04/day2-exercises/)
