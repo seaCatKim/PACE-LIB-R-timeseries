@@ -103,6 +103,9 @@ There are 16 total variables in the lizards.csv data we'll read in. The ones we'
 
 
 ```r
+# to read the code in from github use the following:
+# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/jornada_lizards.csv")
+
 lizards <- read_csv("data/jornada_lizards.csv", trim_ws = TRUE) %>% 
   mutate(date = as.Date(date, format = '%m/%d/%y')) %>% 
   mutate_if(is.character, as.factor)
@@ -123,8 +126,6 @@ glimpse(lizards)
 ## $ weight       <dbl> 26, 6, 24, 25, 24, 22, 3, 9, 16, 9, 16, 21, NA, 19, 26, 1~
 ## $ tail         <fct> B, B, W, W, B, W, B, W, W, W, W, W, NA, W, B, W, NA, W, B~
 ## $ pc           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
-# to read the code in from github use the following:
-# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/jornada_lizards.csv") 
 class(lizards)
 ## [1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame"
 ```

@@ -90,13 +90,14 @@ There are 16 total variables in the lizards.csv data we'll read in. The ones we'
 * `tail`: tail condition (b = broken; w = whole)
 
 ```{r read lizards, message=FALSE}
+# to read the code in from github use the following:
+# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/jornada_lizards.csv")
+
 lizards <- read_csv("data/jornada_lizards.csv", trim_ws = TRUE) %>% 
   mutate(date = as.Date(date, format = '%m/%d/%y')) %>% 
   mutate_if(is.character, as.factor)
 glimpse(lizards)
 
-# to read the code in from github use the following:
-# code <- read_csv("https://raw.githubusercontent.com/seaCatKim/CBCS-LIB_Rworkshop/main/content/post/2020-12-01-r-rmarkdown/data/jornada_lizards.csv") 
 class(lizards)
 ```
 
