@@ -35,4 +35,4 @@ Contact the training team at: library dot uq dot edu dot au
 CBCS can be contacted at: cbcs-info at uq dot edu dot au
 
 # License
-The material is released under a Creative Commons - Attribution 4.0 International Licence. You may re-use and re-mix the material in any way you wish, without asking permission, provided you cite the original source. However, we’d love to hear about what you do with it!
+The material is released under a [Creative Commons - Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may re-use and re-mix the material in any way you wish, without asking permission, provided you cite the original source. However, we’d love to hear about what you do with it!
