@@ -1,6 +1,6 @@
 ---
 title: "Part 1: Working with time series data"
-slug:
+slug: "timeseries data"
 subtitle: "Pharmacy Australia Centre of Excellence + Library R workshop"
 author: "Stephane Guillou"
 date: "2022-02-03"
