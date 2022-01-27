@@ -12,7 +12,6 @@ Technology Trainer, UQ Library <br>
 
 ![headshot of Catherine Kim, Asian girl with glasses, blue hair in front of a green leafy wall](/./about_files/ckim_pic.png)<br>
 Catherine Kim <br>
-Postdoctoral Associate, School of Biological Sciences, CBCS<br>
 Technology Trainer, UQ Library <br>
 
 # Contact
@@ -20,7 +19,7 @@ Are you a member of the UQ community that is interested in a training workshop t
 
 Contact the training team at: library dot uq dot edu dot au
 
-CBCS can be contacted at: cbcs-info at uq dot edu dot au
+PACE can be contacted at: pharmacy@enquire.uq.edu.au
 
 # License
 The material is released under a [Creative Commons - Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may re-use and re-mix the material in any way you wish, without asking permission, provided you cite the original source. However, we’d love to hear about what you do with it!
