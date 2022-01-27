@@ -17,16 +17,16 @@ menu:
     - name: About
       url: /about/
     - name: GitHub
-      url: https://github.com/seaCatKim/CBCS-LIB_Rworkshop
-    - name: Twitter
+      url: https://github.com/seaCatKim/PACE-LIB_R-timeseries
+    - name: UQ Library Twitter
       url: https://twitter.com/UQ_Library
-    - name: CBCS
-      url: https://cbcs.centre.uq.edu.au/
+    - name: PACE
+      url: https://pharmacy.uq.edu.au/about/pharmacy-australia-centre-excellence
 params:
   orgName: "The University of Queensland"
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
-  description: The accompanying resource for a 2-day R workshop at The University of Queensland run by the Centre for Biodiversity and Conservation Science and the University Library.
+  description: The accompanying resource for a half-day R workshop by The University of Queensland Library in collaboration with the Pharmacy Australia Centre of Excellence (PACE).
   favicon: favicon.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
