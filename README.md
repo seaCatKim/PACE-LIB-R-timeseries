@@ -1,4 +1,4 @@
-# CBCS Library R workshop
+# PACE Library R workshop
 
-Repository for the [website content](https://cbcs-lib-rworkshop2021.netlify.app/) for a two-day R workshop for The University of 
-Queensland's (UQ) Centre for Biodiversity and Conservation Science in partnershp with the UQ Library.
+Repository for the website content for a half-day R workshop for The University of 
+Queensland's (UQ) Pharmacy Australia Centre of Excellence in partnership with the UQ Library.
