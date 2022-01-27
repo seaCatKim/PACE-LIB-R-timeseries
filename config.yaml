@@ -1,6 +1,6 @@
-baseurl: https://cbcs-lib-rworkshop2021.netlify.app/
+baseurl: https://pace-lib-rtimeseries2022.netlify.app/
 languageCode: en-us
-title: R workshop website for CBCS and LIB
+title: UQ PACE and LIB Time Series R Workshop
 theme: hugo-lithium
 googleAnalytics: ''
 disqusShortname: ''
@@ -17,7 +17,7 @@ menu:
     - name: About
       url: /about/
     - name: GitHub
-      url: https://github.com/seaCatKim/PACE-LIB_R-timeseries
+      url: https://github.com/seaCatKim/PACE-LIB-R-timeseries
     - name: UQ Library Twitter
       url: https://twitter.com/UQ_Library
     - name: PACE
@@ -26,7 +26,7 @@ params:
   orgName: "The University of Queensland"
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
-  description: The accompanying resource for a half-day R workshop by The University of Queensland Library in collaboration with the Pharmacy Australia Centre of Excellence (PACE).
+  description: The accompanying resource for a half-day R time series workshop by The University of Queensland Library in collaboration with the Pharmacy Australia Centre of Excellence (PACE).
   favicon: favicon.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
