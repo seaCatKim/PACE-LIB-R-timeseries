@@ -3,7 +3,7 @@ title: "Part 2: Analysing Time Series Data"
 subtitle: "Pharmacy Australia Centre of Excellence x Library R workshop"
 slug: "analysing"
 author: "Catherine Kim"
-date: "2022-02-03"
+date: "2022-01-27"
 categories: ["R"]
 tags: [""]
 output:
