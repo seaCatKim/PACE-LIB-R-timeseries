@@ -1,6 +1,6 @@
 baseurl: https://pace-lib-rtimeseries2022.netlify.app/
 languageCode: en-us
-title: UQ PACE and LIB Time Series R Workshop
+title: UQ Library-PACE Time Series R Workshop
 theme: hugo-lithium
 googleAnalytics: ''
 disqusShortname: ''
@@ -27,7 +27,7 @@ params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
   description: The accompanying resource for a half-day R time series workshop by The University of Queensland Library in collaboration with the Pharmacy Australia Centre of Excellence (PACE).
-  favicon: favicon.ico
+  favicon: uqrug_favicon.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
     - r
