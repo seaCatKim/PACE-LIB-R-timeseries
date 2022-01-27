@@ -3,7 +3,7 @@ date: "2016-05-05T21:48:51-07:00"
 title: About
 ---
 
-This website and associated repository were created to publish the supporting material for a half-day workshop in R for the [Pharmacy Australia Centre of Excellence](https://pharmacy.uq.edu.au/about/pharmacy-australia-centre-excellence) (PACE) at The University of Queensland in partnership with the [University Library](https://www.library.uq.edu.au/).
+This website and associated repository were created to publish the supporting material for a half-day R workshop on working with and analysing time series data for the [Pharmacy Australia Centre of Excellence](https://pharmacy.uq.edu.au/about/pharmacy-australia-centre-excellence) (PACE) at The University of Queensland in partnership with the [University Library](https://www.library.uq.edu.au/).
 
 # Workshop Trainers
 ![headshot of Stéphane Guillou](/./about_files/stragu_pic.png)<br>
