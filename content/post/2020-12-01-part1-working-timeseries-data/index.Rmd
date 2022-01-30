@@ -49,4 +49,81 @@ library(lubridate)
 
 ## About the data
 
-...
+Sampling design: Atmospheric samples of the Compound X were collected each day during seven consecutive days for different month in the year. Some year and months had less samples due to technical problems.
+
+
+### Read in the data
+
+```{r}
+library(readxl)
+# only one sheet
+analytes <- read_excel("Data workshop.xlsx", sheet = 2)
+# excel_sheets() shows the sheet names
+excel_sheets("Data workshop.xlsx")
+```
+
+### Bind several excel sheets
+
+```{r}
+library(purrr)
+analytes <- map_dfr(excel_sheets("Data workshop.xlsx")[2:3],
+                    ~ read_excel("Data workshop.xlsx", sheet = .x))
+```
+
+## Data cleaning
+
+```{r}
+# all same compound
+analytes$Analyte <- "x"
+
+# easier names
+library(dplyr)
+analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 7)
+
+# site shouldn't be numeric
+analytes <- mutate(analytes, Site = as.character(Site))
+```
+
+## Quick viz of the data
+
+```{r}
+library(ggplot2)
+ggplot(analytes, 
+       aes(x = Date, y = mg_per_day, colour = Site)) +
+  geom_line()
+# line plot is not great because of the periodicity (bursts of sampling)
+
+# smooth line that doesn't smooth too much:
+ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
+  geom_point(size = 0.3) +
+  geom_smooth(span = 0.05)
+# careful: creates artificial dip in site 1335 to fit the data.
+# confidence interval shows uncertainty.
+```
+
+```{r}
+chem <- read_csv("tailored_data_R.csv") 
+head(chem)
+```
+
+Change columns to appropriate data type:
+
+```{r}
+chem$`Site code` <- as.factor(chem$`Site code`)
+chem$Analyte <- as.factor(chem$Analyte)
+chem$Date <- as.Date(chem$Date, format =  "%d/%m/%Y")
+
+head(chem)
+```
+
+## Visualize the data
+
+```{r}
+ggplot(data = chem,
+       aes(x = Date,
+           y = `mg/day`)) +
+   geom_point()
+```
+
+
+
