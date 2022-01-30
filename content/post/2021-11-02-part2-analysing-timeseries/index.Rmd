@@ -49,3 +49,181 @@ library(lubridate)
 ## About the data
 
 ...
+
+## Read in the excel sheets
+
+```{r}
+library(readxl)
+analytes <- map_dfr(excel_sheets("Data workshop.xlsx")[2:3],
+                    ~ read_excel("Data workshop.xlsx", sheet = .x))
+```
+
+Rename some columns:
+
+```{r}
+analytes$Analyte <- "x"
+
+analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 7)
+
+analytes <- mutate(analytes, Site = as.character(Site), # Site as chracter
+                   Year = as.factor(Year),
+                   Month = as.factor(Month))
+```
+
+separate dataframes per site.
+
+```{r}
+s1335 <- read_excel("Data workshop.xlsx", sheet = 3) %>% 
+   rename(Site = 1, Date = 3, mg_per_day = 7) %>% 
+   mutate(Site = as.character(Site), # Site as chracter
+                   Year = as.factor(Year),
+                   Month = as.factor(Month)) 
+   
+
+s759 <- read_excel("Data workshop.xlsx", sheet = 2) %>% 
+   rename(Site = 1, Date = 3, mg_per_day = 7) %>% 
+   mutate(Site = as.character(Site), # Site as chracter
+                   Year = as.factor(Year),
+                   Month = as.factor(Month)) 
+```
+
+### plot data
+
+```{r}
+ggplot(analytes,
+        aes(Date, mg_per_day, color = Site)) +
+   geom_point()
+```
+
+Average samples by month - too many missing observations...
+
+```{r}
+ave_s1335 <- s1335 %>% 
+   group_by(Year, Month, Site) %>% 
+   summarize(mg_per_day = mean(mg_per_day))
+
+ts_1335 <- ts(ave_s1335$mg_per_day, frequency = 12,
+                 start = c(1991, 11), end = c(2000, 9))
+
+class(ts_1335)
+ts_1335
+```
+
+## Investigating the time series data
+
+Yt = St + Tt + Et
+
+Or multiplicative
+
+Yt = St * Tt * Et
+
+First we need to convert our time series to a ts data type.
+
+Next we can use the `decompose()` function to 
+
+# giving errors!
+
+```{r}
+decomp_1335 <- decompose(ts_1335)
+plot(decomp_1335)
+```
+
+Remove seasonality components.
+
+```{r}
+library(forecast)
+stl_1335 <- stl(ts_1335, s.window = "periodic")
+
+sa_1335 <- seasadj(stl_1335)
+
+
+par(mfrow = c(2,1))
+plot(ts_1335) #, type = "1")
+plot(sa_1335)
+
+par(mfrow = c(1,1))
+seasonplot(sa_1335, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: Site 1335")
+```
+
+## Autocorrelation
+
+Correlograms, k lags on x-axis and the unit of lag is sampling interval (month here). Lag 0 correlation is always 1, helps to compare other lags
+```{r}
+acf(analytes$mg_per_day)
+pacf(analytes$mg_per_day)
+```
+
+```{r}
+library(tseries)
+adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
+kpss.test(ts_1335)
+```
+
+Differencing
+
+```{r}
+nsdiffs(ts_1335)
+```
+
+## AR model
+
+```{r}
+ar_1335 <- ar(ts_1335, method = "mle")
+
+mean(ts_1335)
+
+ar_1335$order
+ar_1335$ar
+acf(ar_1335$res[-(1:ar_1335$order)], lag = 50) 
+```
+
+## regression
+
+```{r}
+chem <- window(ts_1335, start = 1991)
+head(chem)
+
+chem.lm <- lm(chem ~ time(chem))
+coef(chem.lm)
+
+confint(chem.lm)
+acf(resid(chem.lm))
+```
+
+## gls
+
+```{r}
+library(nlme)
+chem.gls <- gls(chem ~ time(chem), cor = corAR1(0.7))
+coef(chem.gls)
+confint(chem.gls)
+acf(resid(chem.gls))
+```
+
+## seasonal component
+
+```{r}
+Seas <- cycle(chem)
+Time <- time(chem)
+chem.lm <- lm(chem ~ 0 + Time + factor(Seas))
+coef(chem.lm)
+acf(resid(chem.lm))
+```
+
+## ARIMA
+
+```{r}
+par(mfrow = c(2,1))
+plot(ts_1335)
+plot(diff(ts_1335))
+```
+
+```{r}
+AIC (arima(ts_1335, order = c(1,1,0),
+seas = list(order = c(1,0,0), 12)))
+
+chem.arima <-  (arima(ts_1335, order = c(0,1,1),
+seas = list(order = c(0,0,1), 12)))
+
+acf(resid(chem.arima), lag = 50)
+
