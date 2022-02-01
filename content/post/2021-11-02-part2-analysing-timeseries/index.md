@@ -109,10 +109,10 @@ The maximum number of samples we have per month is 7. Probably not enough to do 
 
 ```r
 ave_s1335 <- s1335 %>% 
-   group_by(Year, Month, Site) %>% 
+   group_by(Year, Month, Site, Date) %>% 
    summarize(mg_per_day = mean(mg_per_day),
              SD = sd(mg_per_day))
-## `summarise()` has grouped output by 'Year', 'Month'. You can override using the `.groups` argument.
+## `summarise()` has grouped output by 'Year', 'Month', 'Site'. You can override using the `.groups` argument.
 ```
 
 Alternatively, can graphically summarize the distribution of dates using the `hist()` (`hist.Date()`) function. 
@@ -143,26 +143,26 @@ class(ts_1335) # check the object class
 ts_1335 # see the data
 ##             Jan        Feb        Mar        Apr        May        Jun
 ## 1991                                                                  
-## 1992 0.27545325 0.25955623 0.17283015 0.24237330 0.21492034 0.21685501
-## 1993 0.24936087 0.26921357 0.30978222 0.25693728 0.37014955 0.33177930
-## 1994 0.34481141 0.34235679 0.36426187 0.46659618 0.44669432 0.37206745
-## 1995 0.65457749 0.69834479 0.62221301 0.57168051 0.40724687 0.41195379
-## 1996 0.24812201 0.25220778 0.32420921 0.40677658 0.49618890 0.34124538
-## 1997 0.49926914 0.48207736 0.26538307 0.24687993 0.24478730 0.18937818
-## 1998 0.21492034 0.21685501 0.21884272 0.29415920 0.18834451 0.09494631
-## 1999 0.37014955 0.33177930 0.27831867 0.33660285 0.32467068 0.26865238
-## 2000 0.44669432 0.37206745 0.39990788 0.47986144 0.33436319 0.38241556
+## 1992 0.19720048 0.17287674 0.22245691 0.19099507 0.29837595 0.25253055
+## 1993 0.16021289 0.17687754 0.17556807 0.18637328 0.23178339 0.25296320
+## 1994 0.26344432 0.22925615 0.20842929 0.37041379 0.24118309 0.27879146
+## 1995 0.21130029 0.19121012 0.10307317 0.08241862 0.09931825 0.08333792
+## 1996 0.14728220 0.16492892 0.19284190 0.17767449 0.17986075 0.20276905
+## 1997 0.21863033 0.24410228 0.23386617 0.25159712 0.30447740 0.29352118
+## 1998 0.30978222 0.25296185 0.21872907 0.23005210 0.24302850 0.27009450
+## 1999 0.29154410 0.36545669 0.38763046 0.32599558 0.34510937 0.29771991
+## 2000 0.30085380 0.25189903 0.25521031 0.27594033 0.40270498 0.28076867
 ##             Jul        Aug        Sep        Oct        Nov        Dec
-## 1991                                             0.22975903 0.19544291
-## 1992 0.21884272 0.29415920 0.18834451 0.09494631 0.16351067 0.20807004
-## 1993 0.27831867 0.33660285 0.32467068 0.26865238 0.31360895 0.26773691
-## 1994 0.39990788 0.47986144 0.33436319 0.38241556 0.38570498 0.46601276
-## 1995 0.50863024 0.60921090 0.66656370 0.67302314 0.84627446 0.26116715
-## 1996 0.36344698 0.32072347 0.29003143 0.26723167 0.35837799 0.42259062
-## 1997 0.22975903 0.19544291 0.27545325 0.25955623 0.17283015 0.24237330
-## 1998 0.16351067 0.20807004 0.24936087 0.26921357 0.30978222 0.25693728
-## 1999 0.31360895 0.26773691 0.34481141 0.34235679 0.36426187 0.46659618
-## 2000 0.38570498 0.46601276 0.65457749
+## 1991                                             0.25306877 0.23900784
+## 1992 0.25565163 0.28373564 0.23251146 0.21234847 0.31353391 0.16511895
+## 1993 0.28689861 0.19435768 0.18664468 0.19178039 0.20202774 0.18509298
+## 1994 0.28624845 0.21469297 0.18553862 0.17246271 0.17704678 0.16616008
+## 1995 0.08211737 0.11941252 0.18315669 0.17061648 0.14140745 0.14434108
+## 1996 0.20712967 0.22212884 0.24918299 0.21774453 0.25409175 0.23876105
+## 1997 0.26507705 0.25044615 0.24562185 0.24100262 0.27477369 0.31405246
+## 1998 0.32675768 0.32439414 0.25294530 0.37859670 0.68902957 0.28908035
+## 1999 0.29811903 0.30952621 0.35835451 0.27831867 0.59599662 0.33971704
+## 2000 0.27500903 0.28545684 0.31936740
 ```
 
 ## Create a irregularly spaced time series using the zoo (Zeileis ordered observations) package
@@ -179,39 +179,76 @@ head(z_1335)
 ##  0.2530688  0.2390078  0.1972005  0.1728767  0.2224569  0.1909951
 ```
 
-## Investigating the time series data
+## Decomposition
 
-Yt = St + Tt + Et
+Decomposition separates out a times series `\(Y_{t}\)` into a seasonal `\(S_{t}\)`, trend `\(T_{t}\)`, and error/residual `\(E_{t}\)` components.
 
-Or multiplicative
+These elements can be *additive* when the seasonal component is relatively constant over time.
 
-Yt = St * Tt * Et
+`$$Y_{t} = S_{t} + T_{t} + E_{t}$$`
 
-First we need to convert our time series to a ts data type.
+Or *multiplicative* when seasonal effects tend to increase as the trend increases.
 
-Next we can use the `decompose()` function to 
+`$$Y_{t} = S_{t} * T_{t} * E_{t}$$`
+
+The `decompose()` function uses a moving average (MA) approach to filter the data. The *window* or period over which you after is based on the frequency of the data. For example, monthly data can be averaged across a 12 month period.
 
 
 ```r
-decomp_1335 <- decompose(ts_1335)
-plot(decomp_1335)
+library(xts)
+## 
+## Attaching package: 'xts'
+## The following objects are masked from 'package:dplyr':
+## 
+##     first, last
+xts_1335 <- as.xts(x = ave_s1335$mg_per_day, order.by = ave_s1335$Date)
+
+k2 <- rollmean(xts_1335, k = 2)
+k4 <- rollmean(xts_1335, k = 4)
+k8 <- rollmean(xts_1335, k = 8)
+k16 <- rollmean(xts_1335, k = 16)
+k32 <- rollmean(xts_1335, k = 32)
+
+kALL <- merge.xts(xts_1335, k2, k4, k8, k16, k32)
+head(kALL)
+## Warning: timezone of object (UTC) is different than current timezone ().
+##             xts_1335        k2        k4        k8 k16 k32
+## 1991-11-28 0.2530688 0.2460383        NA        NA  NA  NA
+## 1991-11-29 0.2390078 0.2181042 0.2155385        NA  NA  NA
+## 1991-11-30 0.1972005 0.1850386 0.2078855        NA  NA  NA
+## 1991-12-01 0.1728767 0.1976668 0.1958823 0.2283140  NA  NA
+## 1991-12-02 0.2224569 0.2067260 0.2211762 0.2286369  NA  NA
+## 1991-12-03 0.1909951 0.2446855 0.2410896 0.2342279  NA  NA
+plot.xts(kALL, multi.panel = TRUE)
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
 
-Remove seasonality components using the forecast package.
+Let's use the  use the `stats::decompose()` function for an additive model:
+
+
+```r
+decomp_1335 <- decompose(ts_1335, type = "additive") # additive is the default
+plot(decomp_1335)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="672" />
+
+In the top 'observed' plot there does not appear to be a clear case of seasonality increasing over time so the additive model should be fine. There is a huge peak in the trend in 1995 which decreases until around 1998 before increasing again.
+
+## Remove seasonality components using the forecast package.
 
 
 ```r
 stl_1335 <- stl(ts_1335, s.window = "periodic") # deompose into seasonal, trend, and irregular components
 head(stl_1335$time.series)
-##              seasonal     trend    remainder
-## Nov 1991  0.021512597 0.2253694 -0.017122969
-## Dec 1991 -0.019995577 0.2243884 -0.008949903
-## Jan 1992  0.035564624 0.2234074  0.016481258
-## Feb 1992  0.024725533 0.2220857  0.012744950
-## Mar 1992 -0.007203528 0.2207641 -0.040730440
-## Apr 1992  0.028745667 0.2191495 -0.005521904
+##             seasonal     trend   remainder
+## Nov 1991  0.07940866 0.2156235 -0.04196336
+## Dec 1991 -0.01238431 0.2188676  0.03252456
+## Jan 1992 -0.01100365 0.2221117 -0.01390757
+## Feb 1992 -0.01707596 0.2246125 -0.03465983
+## Mar 1992 -0.02326860 0.2271134  0.01861217
+## Apr 1992 -0.01359065 0.2288255 -0.02423981
 ```
 
 The seasonal and reminder/irregular components are small compared to the trend component.
@@ -227,7 +264,7 @@ plot(ts_1335) #, type = "1")
 plot(sa_1335)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
 
 These two plots are pretty much the same. There does not seem to be a large seasonality component in the data.
 
@@ -239,9 +276,40 @@ par(mfrow = c(1,1))
 seasonplot(sa_1335, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: Site 1335")
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
 
 The lines do not really follow the same pattern throughout the year - again, not a big seasonality component.
+
+## Stationarity
+
+Test for stationarity.
+
+
+```r
+library(tseries)
+adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
+## 
+## 	Augmented Dickey-Fuller Test
+## 
+## data:  ts_1335
+## Dickey-Fuller = -2.7241, Lag order = 4, p-value = 0.2763
+## alternative hypothesis: stationary
+kpss.test(ts_1335)
+## Warning in kpss.test(ts_1335): p-value smaller than printed p-value
+## 
+## 	KPSS Test for Level Stationarity
+## 
+## data:  ts_1335
+## KPSS Level = 1.0517, Truncation lag parameter = 4, p-value = 0.01
+```
+
+## Differencing
+
+
+```r
+nsdiffs(ts_1335)
+## [1] 0
+```
 
 ## Autocorrelation
 
@@ -258,7 +326,7 @@ The cutest explanation of ACF by Dr Allison Horst:
 acf(s1335$mg_per_day)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" />
 
 You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, there are 3 to 4 significant autocorrelation. The lags crossing the dotted blue line are statistically significant.
 
@@ -270,7 +338,7 @@ The **partial autocorrelation function** can also be plotted. The partial correl
 pacf(s1335$mg_per_day)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" />
 
 Practically, this can help us identify the number of autoregression (AR) coefficients in an autoregression integrated moving average (ARIMA) model. The above plot shows *k* = 3 so the initial ARIMA model will have three AR coefficients (AR(3)). The model will still require fitting and checking.
 
@@ -285,41 +353,12 @@ Box.test(ts_1335)
 ## 	Box-Pierce test
 ## 
 ## data:  ts_1335
-## X-squared = 57.808, df = 1, p-value = 2.887e-14
+## X-squared = 36.1, df = 1, p-value = 1.874e-09
 ```
 
 The p-value is significant which means the data contains significant autocorrelations.
 
-## Stationarity
 
-Test for stationarity.
-
-
-```r
-library(tseries)
-adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
-## 
-## 	Augmented Dickey-Fuller Test
-## 
-## data:  ts_1335
-## Dickey-Fuller = -2.0988, Lag order = 4, p-value = 0.5357
-## alternative hypothesis: stationary
-kpss.test(ts_1335)
-## Warning in kpss.test(ts_1335): p-value greater than printed p-value
-## 
-## 	KPSS Test for Level Stationarity
-## 
-## data:  ts_1335
-## KPSS Level = 0.2472, Truncation lag parameter = 4, p-value = 0.1
-```
-
-## Differencing
-
-
-```r
-nsdiffs(ts_1335)
-## [1] 0
-```
 
 ## AR model
 
@@ -328,16 +367,15 @@ nsdiffs(ts_1335)
 ar_1335 <- ar(ts_1335, method = "mle")
 
 mean(ts_1335)
-## [1] 0.3390491
+## [1] 0.2461971
 ar_1335$order
-## [1] 6
+## [1] 3
 ar_1335$ar
-## [1]  0.692318630  0.056966778 -0.007328706 -0.164283447  0.023423585
-## [6]  0.284339996
+## [1] 0.3950686 0.1103582 0.2421397
 acf(ar_1335$res[-(1:ar_1335$order)], lag = 50) 
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="672" />
 
 ## regression
 
@@ -347,23 +385,23 @@ chem <- window(ts_1335, start = 1991)
 ## Warning in window.default(x, ...): 'start' value not changed
 head(chem)
 ##            Jan       Feb       Mar       Apr May Jun Jul Aug Sep Oct       Nov
-## 1991                                                                 0.2297590
-## 1992 0.2754533 0.2595562 0.1728301 0.2423733                                  
+## 1991                                                                 0.2530688
+## 1992 0.1972005 0.1728767 0.2224569 0.1909951                                  
 ##            Dec
-## 1991 0.1954429
+## 1991 0.2390078
 ## 1992
 chem.lm <- lm(chem ~ time(chem))
 coef(chem.lm)
-##   (Intercept)    time(chem) 
-## -11.040746179   0.005700586
+##  (Intercept)   time(chem) 
+## -32.15810054   0.01623258
 confint(chem.lm)
-##                     2.5 %     97.5 %
-## (Intercept) -31.137573143 9.05608078
-## time(chem)   -0.004366695 0.01576787
+##                    2.5 %       97.5 %
+## (Intercept) -43.55848720 -20.75771387
+## time(chem)    0.01052169   0.02194348
 acf(resid(chem.lm))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="672" />
 
 ## gls
 
@@ -380,16 +418,16 @@ library(nlme)
 ##     collapse
 chem.gls <- gls(chem ~ time(chem), cor = corAR1(0.7))
 coef(chem.gls)
-## (Intercept)  time(chem) 
-## -27.9996710   0.0141997
+##  (Intercept)   time(chem) 
+## -31.28011126   0.01579311
 confint(chem.gls)
-##                    2.5 %      97.5 %
-## (Intercept) -87.94375365 31.94441156
-## time(chem)   -0.01582862  0.04422801
+##                     2.5 %       97.5 %
+## (Intercept) -50.148423710 -12.41179881
+## time(chem)    0.006341238   0.02524498
 acf(resid(chem.gls))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
 
 ## seasonal component
 
@@ -400,15 +438,15 @@ Time <- time(chem)
 chem.lm <- lm(chem ~ 0 + Time + factor(Seas))
 coef(chem.lm)
 ##           Time  factor(Seas)1  factor(Seas)2  factor(Seas)3  factor(Seas)4 
-##    0.005756378  -11.122691112  -11.131937489  -11.162273796  -11.124295885 
+##     0.01659631   -32.89287141   -32.89988569   -32.90702026   -32.89799718 
 ##  factor(Seas)5  factor(Seas)6  factor(Seas)7  factor(Seas)8  factor(Seas)9 
-##  -11.155275762  -11.202207940  -11.174639108  -11.139997655  -11.123771124 
+##   -32.87111561   -32.88731478   -32.88086313   -32.89100810   -32.89137196 
 ## factor(Seas)10 factor(Seas)11 factor(Seas)12 
-##  -11.171495571  -11.139425944  -11.179592661
+##   -32.89752284   -32.80113584   -32.89359047
 acf(resid(chem.lm))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
 
 ## ARIMA
 
@@ -419,17 +457,23 @@ plot(ts_1335)
 plot(diff(ts_1335))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
 
 
 ```r
 AIC (arima(ts_1335, order = c(1,1,0),
 seas = list(order = c(1,0,0), 12)))
-## [1] -200.1787
+## [1] -254.7406
 chem.arima <-  (arima(ts_1335, order = c(0,1,1),
 seas = list(order = c(0,0,1), 12)))
 
 acf(resid(chem.arima), lag = 50)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="672" />
+
+## Resources 
+
+Resources used to compile this session included:
+* [Ch 14 Time Series Analysis](https://rc2e.com/timeseriesanalysis) in R Cookbook, 2nd edition, by JD Long and Paul Teetor. Copyright 2019 JD Long and Paul Teetor, 978-1-492-04068-2
+* [Time Series Analysis with R](https://nicolarighetti.github.io/Time-Series-Analysis-With-R/) by Nicola Righetti

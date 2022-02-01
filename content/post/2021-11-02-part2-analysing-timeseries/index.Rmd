@@ -89,7 +89,7 @@ The maximum number of samples we have per month is 7. Probably not enough to do 
 
 ```{r}
 ave_s1335 <- s1335 %>% 
-   group_by(Year, Month, Site) %>% 
+   group_by(Year, Month, Site, Date) %>% 
    summarize(mg_per_day = mean(mg_per_day),
              SD = sd(mg_per_day))
 ```
@@ -130,24 +130,46 @@ z_1335 <- zoo(s1335$mg_per_day, order.by = s1335$Date)
 head(z_1335)
 ```
 
-## Investigating the time series data
+## Decomposition
 
-Yt = St + Tt + Et
+Decomposition separates out a times series $Y_{t}$ into a seasonal $S_{t}$, trend $T_{t}$, and error/residual $E_{t}$ components.
 
-Or multiplicative
+These elements can be *additive* when the seasonal component is relatively constant over time.
 
-Yt = St * Tt * Et
+$$Y_{t} = S_{t} + T_{t} + E_{t}$$
 
-First we need to convert our time series to a ts data type.
+Or *multiplicative* when seasonal effects tend to increase as the trend increases.
 
-Next we can use the `decompose()` function to 
+$$Y_{t} = S_{t} * T_{t} * E_{t}$$
+
+The `decompose()` function uses a moving average (MA) approach to filter the data. The *window* or period over which you after is based on the frequency of the data. For example, monthly data can be averaged across a 12 month period.
 
 ```{r}
-decomp_1335 <- decompose(ts_1335)
+library(xts)
+xts_1335 <- as.xts(x = ave_s1335$mg_per_day, order.by = ave_s1335$Date)
+
+k2 <- rollmean(xts_1335, k = 2)
+k4 <- rollmean(xts_1335, k = 4)
+k8 <- rollmean(xts_1335, k = 8)
+k16 <- rollmean(xts_1335, k = 16)
+k32 <- rollmean(xts_1335, k = 32)
+
+kALL <- merge.xts(xts_1335, k2, k4, k8, k16, k32)
+head(kALL)
+
+plot.xts(kALL, multi.panel = TRUE)
+```
+
+Let's use the  use the `stats::decompose()` function for an additive model:
+
+```{r}
+decomp_1335 <- decompose(ts_1335, type = "additive") # additive is the default
 plot(decomp_1335)
 ```
 
-Remove seasonality components using the forecast package.
+In the top 'observed' plot there does not appear to be a clear case of seasonality increasing over time so the additive model should be fine. There is a huge peak in the trend in 1995 which decreases until around 1998 before increasing again.
+
+## Remove seasonality components using the forecast package.
 
 ```{r}
 stl_1335 <- stl(ts_1335, s.window = "periodic") # deompose into seasonal, trend, and irregular components
@@ -176,6 +198,22 @@ seasonplot(sa_1335, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: 
 ```
 
 The lines do not really follow the same pattern throughout the year - again, not a big seasonality component.
+
+## Stationarity
+
+Test for stationarity.
+
+```{r}
+library(tseries)
+adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
+kpss.test(ts_1335)
+```
+
+## Differencing
+
+```{r}
+nsdiffs(ts_1335)
+```
 
 ## Autocorrelation
 
@@ -212,21 +250,7 @@ Box.test(ts_1335)
 
 The p-value is significant which means the data contains significant autocorrelations.
 
-## Stationarity
 
-Test for stationarity.
-
-```{r}
-library(tseries)
-adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
-kpss.test(ts_1335)
-```
-
-## Differencing
-
-```{r}
-nsdiffs(ts_1335)
-```
 
 ## AR model
 
@@ -289,4 +313,10 @@ chem.arima <-  (arima(ts_1335, order = c(0,1,1),
 seas = list(order = c(0,0,1), 12)))
 
 acf(resid(chem.arima), lag = 50)
+```
 
+## Resources 
+
+Resources used to compile this session included:
+* [Ch 14 Time Series Analysis](https://rc2e.com/timeseriesanalysis) in R Cookbook, 2nd edition, by JD Long and Paul Teetor. Copyright 2019 JD Long and Paul Teetor, 978-1-492-04068-2
+* [Time Series Analysis with R](https://nicolarighetti.github.io/Time-Series-Analysis-With-R/) by Nicola Righetti
