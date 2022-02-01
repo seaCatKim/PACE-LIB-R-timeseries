@@ -41,9 +41,13 @@ In this hands-on session...
 
 ## Load packages
 
-```{r packages, warning=FALSE}
+```{r packages, warning=FALSE, message = FALSE}
 library(tidyverse)
-library(lubridate)
+library(lubridate) # work with dates
+library(readxl) # read excel files
+
+library(zoo)
+library(forecast)
 ```
 
 ## About the data
@@ -52,61 +56,78 @@ library(lubridate)
 
 ## Read in the excel sheets
 
-```{r}
-library(readxl)
-analytes <- map_dfr(excel_sheets("Data workshop.xlsx")[2:3],
-                    ~ read_excel("Data workshop.xlsx", sheet = .x))
-```
+For this section, we will go the process of analysing time series for one site. 
 
-Rename some columns:
-
-```{r}
-analytes$Analyte <- "x"
-
-analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 7)
-
-analytes <- mutate(analytes, Site = as.character(Site), # Site as chracter
-                   Year = as.factor(Year),
-                   Month = as.factor(Month))
-```
-
-separate dataframes per site.
+Let's read in the first just the first site sheet from the excel file.
 
 ```{r}
 s1335 <- read_excel("Data workshop.xlsx", sheet = 3) %>% 
    rename(Site = 1, Date = 3, mg_per_day = 7) %>% 
-   mutate(Site = as.character(Site), # Site as chracter
-                   Year = as.factor(Year),
-                   Month = as.factor(Month)) 
-   
-
-s759 <- read_excel("Data workshop.xlsx", sheet = 2) %>% 
-   rename(Site = 1, Date = 3, mg_per_day = 7) %>% 
-   mutate(Site = as.character(Site), # Site as chracter
+   mutate(Site = factor(Site), # change columns to factor
                    Year = as.factor(Year),
                    Month = as.factor(Month)) 
 ```
 
-### plot data
+### Visualize the data for one site
 
 ```{r}
-ggplot(analytes,
+ggplot(s1335,
         aes(Date, mg_per_day, color = Site)) +
    geom_point()
 ```
 
-Average samples by month - too many missing observations...
+Count the number of samples per month.
+
+```{r}
+s1335 %>% 
+   group_by(Year, Month) %>% 
+   summarize(count = n()) %>% 
+   arrange(-count) # arrange by count column in descending order
+```
+
+The maximum number of samples we have per month is 7. Probably not enough to do any meaningful analysis for a daily trend. Let's average samples by month. There also can be no data gaps for a time series (ts) data class.
 
 ```{r}
 ave_s1335 <- s1335 %>% 
    group_by(Year, Month, Site) %>% 
-   summarize(mg_per_day = mean(mg_per_day))
+   summarize(mg_per_day = mean(mg_per_day),
+             SD = sd(mg_per_day))
+```
 
+Alternatively, can graphically summarize the distribution of dates using the `hist()` (`hist.Date()`) function. 
+
+```{r}
+hist(as.Date(s1335$Date), # change POSIXct to Date object
+     breaks = "months", 
+     freq = TRUE,
+     xlab = "", # remove label so doesn't overlap with date labels,
+     format = "%b %Y", # format the date label, mon year
+     las = 2)
+```
+
+Let's convert our data into a time series. Times series data must be sampled at equispaced points in time.
+
+There are several different time series object that have different functionalalities such as working with irregularly spaced time series. See this [resource](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf).
+
+```{r}
 ts_1335 <- ts(ave_s1335$mg_per_day, frequency = 12,
                  start = c(1991, 11), end = c(2000, 9))
 
-class(ts_1335)
-ts_1335
+class(ts_1335) # check the object class
+ts_1335 # see the data
+
+
+```
+
+## Create a irregularly spaced time series using the zoo (Zeileis ordered observations) package
+
+The `zoo` class is a flexible time series data with an ordered time index. The data is stored in a matrix with vector date information attached. Can be regularly or irregularly spaced.
+
+```{r}
+library(zoo)
+z_1335 <- zoo(s1335$mg_per_day, order.by = s1335$Date)
+
+head(z_1335)
 ```
 
 ## Investigating the time series data
@@ -121,37 +142,79 @@ First we need to convert our time series to a ts data type.
 
 Next we can use the `decompose()` function to 
 
-# giving errors!
-
 ```{r}
 decomp_1335 <- decompose(ts_1335)
 plot(decomp_1335)
 ```
 
-Remove seasonality components.
+Remove seasonality components using the forecast package.
 
 ```{r}
-library(forecast)
-stl_1335 <- stl(ts_1335, s.window = "periodic")
+stl_1335 <- stl(ts_1335, s.window = "periodic") # deompose into seasonal, trend, and irregular components
+head(stl_1335$time.series)
+```
 
-sa_1335 <- seasadj(stl_1335)
+The seasonal and reminder/irregular components are small compared to the trend component.
 
+Let's seasonally adjust the data and plot the raw data and adjusted data.
+
+```{r}
+sa_1335 <- seasadj(stl_1335) # seasonally adjusted data
 
 par(mfrow = c(2,1))
 plot(ts_1335) #, type = "1")
 plot(sa_1335)
+```
 
+These two plots are pretty much the same. There does not seem to be a large seasonality component in the data.
+
+Plot the time series against the seasons in separate years.
+
+```{r}
 par(mfrow = c(1,1))
 seasonplot(sa_1335, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: Site 1335")
 ```
 
+The lines do not really follow the same pattern throughout the year - again, not a big seasonality component.
+
 ## Autocorrelation
 
-Correlograms, k lags on x-axis and the unit of lag is sampling interval (month here). Lag 0 correlation is always 1, helps to compare other lags
+### Autocorrelation plots
+
+Plot the **autocorrelation function** (ACF) correlogram for the time series. There are *k* lags on the x-axis and the unit of lag is sampling interval (month here). Lag 0 is always the theoretical maximum of 1 and helps to compare other lags. 
+
+The cutest explanation of ACF by Dr Allison Horst:
+
+![acf art by Allison Horst](acf_1.jpg)
+
 ```{r}
-acf(analytes$mg_per_day)
-pacf(analytes$mg_per_day)
+acf(s1335$mg_per_day)
 ```
+
+You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, there are 3 to 4 significant autocorrelation. The lags crossing the dotted blue line are statistically significant.
+
+
+The **partial autocorrelation function** can also be plotted. The partial correlation is the left over correlation at lag *k* between all data points that are *k* steps apart accounting for the correlation with the data between *k* steps.
+
+```{r}
+pacf(s1335$mg_per_day)
+```
+
+Practically, this can help us identify the number of autoregression (AR) coefficients in an autoregression integrated moving average (ARIMA) model. The above plot shows *k* = 3 so the initial ARIMA model will have three AR coefficients (AR(3)). The model will still require fitting and checking.
+
+### Autocorrelation test
+
+There is also the `base::Box.test()` function that can be used to test for autocorrelation:
+
+```{r}
+Box.test(ts_1335)
+```
+
+The p-value is significant which means the data contains significant autocorrelations.
+
+## Stationarity
+
+Test for stationarity.
 
 ```{r}
 library(tseries)
@@ -159,7 +222,7 @@ adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
 kpss.test(ts_1335)
 ```
 
-Differencing
+## Differencing
 
 ```{r}
 nsdiffs(ts_1335)
