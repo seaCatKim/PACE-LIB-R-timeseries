@@ -150,7 +150,7 @@ We could map a function by simply providing the name of the function. However, b
 
 ## Data cleaning
 
-There are a few issues with the dataset. First of all, there are variations in how the compoud is named. We can repalce the value in the first column with a simpler, consistent one:
+There are a few issues with the dataset. First of all, there are variations in how the compound is named. We can replace the value in the first column with a simpler, consistent one:
 
 
 ```r
@@ -158,7 +158,7 @@ There are a few issues with the dataset. First of all, there are variations in h
 analytes$Analyte <- "x"
 ```
 
-Our columns names are not the most reusable names for R. Better names do not contain spaces or special characters like `/`. dplyr's `rename()` function is very handy for that:
+Our column names are not the most reusable names for R. Better names do not contain spaces or special characters like `/`. dplyr's `rename()` function is very handy for that:
 
 
 ```r
@@ -166,7 +166,7 @@ library(dplyr)
 analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 4)
 ```
 
-Finally, the Site column is stored as numeric data. If we plot it as it is, R will consider it to be a contiuous variable, when it really should be discrete. Let's fix that with dplyr's `mutate()` function:
+Finally, the Site column is stored as numeric data. If we plot it as it is, R will consider it to be a continuous variable, when it really should be discrete. Let's fix that with dplyr's `mutate()` function:
 
 
 ```r
@@ -187,34 +187,65 @@ write.csv(analytes, "data/analytes_data_clean.csv",
 
 > `write.csv()` will by default include a column of row names in the exported file, which are the row numbers if no row names have been assigned. That's not usually something we want, so we can turn it off with `row.names = FALSE`
 
-## Quick viz of the data
+## Visualisation with ggplot2
+
+At this stage, we can start exploring visually. For a lot of R users, the go-to package for data visualisation is ggplot2, which is part of the Tidyverse.
+
+For a ggplot2 visualisation, rememember that we usually need this three essential elements:
+
+* the dataset
+* the mapping of aesthetic elements to variables in the dataset
+* the geometry used to represent the data
+
+Let's try a first timeline visualisation with a line plot:
 
 
 ```r
 library(ggplot2)
-ggplot(analytes, 
-       aes(x = Date, y = mg_per_day, colour = Site)) +
-  geom_line()
+ggplot(analytes,             # data
+       aes(x = Date,         # mapping of aesthetics
+           y = mg_per_day,
+           colour = Site)) + # (separate by site)
+  geom_line()                # geometry
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/simple viz-1.png" width="672" />
+
+A simple line plot is not great here, because of the periodicity: there were bursts of sampling, several days in a row, and then nothing for a while. Which results in a fine, daily resolution for small periods of time, and a straight line joining these periods of time.
+
+We might want to "smoothen" that line, hoping to get a better idea of the trend, keeping the original data as points in the background:
+
+
+```r
+ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
+  geom_point() +
+  geom_smooth()
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 
-```r
-# line plot is not great because of the periodicity (bursts of sampling)
+The trend lines only give a very general trend. What if we make it follow the points more closely?
 
-# smooth line that doesn't smooth too much:
+
+```r
 ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
-  geom_point(size = 0.3) +
-  geom_smooth(span = 0.05)
+  geom_point(size = 0.3) + # smaller points
+  geom_smooth(span = 0.05) # follow the data more closely
 ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
 
-```r
-# careful: creates artificial dip in site 1335 to fit the data.
-# confidence interval shows uncertainty.
-```
+With the method used, we end up with an increased uncertainty (the shaded area around the curves). It also creates artificial "dips" to fit the data, for example close to the beginning of 2000 for the site 1335.
+
+## Summarise the data
+
+In this case, because we have sampling points for whole weeks, we can summarise that weekly data as a weekly average.
+
+...
+
+
 
 
 ```r
