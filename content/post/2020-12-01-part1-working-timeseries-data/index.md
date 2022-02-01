@@ -62,12 +62,6 @@ library(tidyverse)
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()
-library(lubridate)
-## 
-## Attaching package: 'lubridate'
-## The following objects are masked from 'package:base':
-## 
-##     date, intersect, setdiff, union
 ```
 
 ## About the data
@@ -241,11 +235,157 @@ With the method used, we end up with an increased uncertainty (the shaded area a
 
 ## Summarise the data
 
-In this case, because we have sampling points for whole weeks, we can summarise that weekly data as a weekly average.
+In this case, because we have sampling points for what looks like groups of successive days, we can try to summarise them.
+
+Operations on time-date data can be done more comfortably with extra packages. The Tidyverse comes with the lubridate package, which has been around for a while and is very powerful. Another, more recent package called "[clock](https://clock.r-lib.org/)" can do most of what lubridate can, and more, but it is still being heavily developped, so we stick to lubridate here.
+
+Let's start by extracting all the date components that could be useful:
+
+
+```r
+library(lubridate)
+## 
+## Attaching package: 'lubridate'
+## The following objects are masked from 'package:base':
+## 
+##     date, intersect, setdiff, union
+analytes <- analytes %>% 
+   mutate(year = year(Date),
+          month = month(Date),
+          day = day(Date),
+          week = week(Date),
+          weekday = weekdays(Date))
+```
+
+How many sampling days per month are there?
+
+
+```r
+analytes %>% 
+   group_by(year, month) %>% 
+   count()
+## # A tibble: 74 × 3
+##     year month     n
+##    <dbl> <dbl> <int>
+##  1  1991    11     5
+##  2  1991    12     8
+##  3  1992     1     3
+##  4  1992     2    11
+##  5  1992     3    11
+##  6  1992     4     3
+##  7  1992     5     8
+##  8  1992     6     6
+##  9  1992     7     4
+## 10  1992     8     9
+## # … with 64 more rows
+```
+
+The number of samples per month is irregular, and some months have no data.
+
+Furthermore, the week numbers don't align with the sampling weeks, and some sampling weeks overlap over two months:
+
+
+```r
+analytes %>%  select(year, month, day, week) %>%  head(15)
+## # A tibble: 15 × 4
+##     year month   day  week
+##    <dbl> <dbl> <int> <dbl>
+##  1  1991    11    29    48
+##  2  1991    11    30    48
+##  3  1991    12     1    48
+##  4  1991    12     2    48
+##  5  1991    12     3    49
+##  6  1991    12     4    49
+##  7  1991    12     5    49
+##  8  1992     1    31     5
+##  9  1992     2     1     5
+## 10  1992     2     2     5
+## 11  1992     2     3     5
+## 12  1992     2     4     5
+## 13  1992     2     5     6
+## 14  1992     2     6     6
+## 15  1992     3    26    13
+```
+
+In any case, the fact that week numbers are reset at the beginning of the year wouldn't help.
+
+One way to group the sampling days together is to detect which ones are spaced by one day, and which ones by a lot more:
+
+
+```r
+analytes <- analytes %>%
+   arrange(Site, Date) %>% # make sure it is in chronological order
+   group_by(Site) %>% # deal with sites separately
+   mutate(days_lapsed = as.integer(Date - lag(Date))) %>%  # compare date to next date
+   ungroup()
+```
+
+> Grouping by site is important, otherwise we get an erroneous value at the row after switching to the second site. Because we grouped, it does not compare to the previous value in the different site, but instead only returns an `NA`.
+
+How consistent are the sampling periods? Let's investigate:
+
+
+```r
+analytes %>% 
+   count(days_lapsed) %>% 
+   head()
+## # A tibble: 6 × 2
+##   days_lapsed     n
+##         <int> <int>
+## 1           1   608
+## 2           2     4
+## 3           3     3
+## 4          39     1
+## 5          42     1
+## 6          43     5
+```
+
+It looks like some sampling days might have been missed, so we can define a sampling period as "a period in which sampling times are not spaced by more than 3 days".
+
+To create a grouping index, we can first assign a value of `TRUE` to the first row of each time period, and then use the cumulative sum function on that column (as it converts `TRUE`s to 1s and `FALSE`s to 0s):
+
+
+```r
+analytes <- analytes %>% 
+   group_by(Site) %>%
+   mutate(sampling_period = row_number() == 1 | days_lapsed > 3,
+          sampling_period = cumsum(sampling_period)) %>%
+   ungroup()
+```
+
+We can now use these new group indices to summarise by time period:
+
+
+```r
+analytes_summary <- analytes %>% 
+   group_by(Analyte, Site, sampling_period) %>% # we are keeping Analyte
+   summarise(Date = round_date(mean(Date), unit = "day"),
+             mg_per_day = mean(mg_per_day)) %>% 
+   ungroup()
+## `summarise()` has grouped output by 'Analyte', 'Site'. You can override using
+## the `.groups` argument.
+```
+
+Let's try again our line plot with the summarise data:
+
+
+```r
+ggplot(analytes_summary,
+       aes(x = Date,
+           y = mg_per_day,
+           colour = Site)) +
+  geom_line()  
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/line plot summarised-1.png" width="672" />
+
+This is a lot cleaner than what we had originally!
+
+## Export summarised data
 
 ...
 
-
+---
 
 
 ```r
