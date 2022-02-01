@@ -15,7 +15,6 @@ output:
 
 
 
-
 **Stéphane Guillou**
 
 Technology Trainer, The University of Queensland Library
@@ -26,11 +25,9 @@ Technology Trainer, The University of Queensland Library
 This R workshop assumes basic knowledge of R including:
 
 * Installing and loading packages
-* How to read in data
-    + read.csv
-    + read_csv
-    + and similar
+* How to read in data with `read.csv()`, `readr::read_csv()` and similar
 * Creating objects in R
+* How to transform data frames and tibbles with `dplyr`
 
 We are happy to have any and all questions though!
 
@@ -42,8 +39,17 @@ In this first part of the workshop, we will learn how to:
 * Clean the data and extract information
 * Explore the data visually
 
+## Create a project
+
+To work cleanly, we need to:
+
+* Create a new project in RStudio
+* Create a new script to write our R code
+* Create a data directory to store our data in
 
 ## Load packages
+
+For this workshop, we will use many tools from the Tidyverse: a collection of packages for data import, transformation, visualisation and export.
 
 
 ```r
@@ -68,6 +74,15 @@ library(lubridate)
 
 Sampling design: Atmospheric samples of the Compound X were collected each day during seven consecutive days for different month in the year. Some year and months had less samples due to technical problems.
 
+### Download the data
+
+Let's download our dataset form the web:
+
+
+```r
+download.file("https://github.com/seaCatKim/PACE-LIB-R-timeseries/raw/main/content/post/2020-12-01-part1-working-timeseries-data/data/analytes_data.xlsx",
+              destfile = "data/analytes_data.xlsx")
+```
 
 ### Read in the data
 
@@ -80,7 +95,8 @@ The package [readxl](https://readxl.tidyverse.org/) is useful for importing data
 # load the package
 library(readxl)
 # only import the second sheet
-analytes <- read_excel("tailored_data.xlsx", sheet = 2)
+analytes <- read_excel("data/analytes_data.xlsx",
+                       sheet = 2)
 ```
 
 We could also point to the correct sheet by using the sheet name instead of its index. For that, the `excel_sheets()` function is useful to find the names:
@@ -88,9 +104,9 @@ We could also point to the correct sheet by using the sheet name instead of its 
 
 ```r
 # excel_sheets() shows the sheet names
-excel_sheets("Data workshop.xlsx")
+excel_sheets("data/analytes_data.xlsx")
 ## [1] "infromation data " "Site_759"          "Site_1335"
-analytes <- read_excel("tailored_data.xlsx", sheet = "Site_759")
+analytes <- read_excel("data/analytes_data.xlsx", sheet = "Site_759")
 ```
 
 Let's have a look at the first few rows of data:
@@ -98,16 +114,17 @@ Let's have a look at the first few rows of data:
 
 ```r
 head(analytes)
-## # A tibble: 6 × 7
-##   `Site code` Analyte    `Real date`           Day Month  Year `mg/day`
-##         <dbl> <chr>      <dttm>              <dbl> <dbl> <dbl>    <dbl>
-## 1         759 Compound x 1991-11-29 00:00:00    29    11  1991    0.334
-## 2         759 Compound x 1991-11-30 00:00:00    30    11  1991    0.231
-## 3         759 Compound x 1991-12-01 00:00:00     1    12  1991    0.216
-## 4         759 Compound x 1991-12-02 00:00:00     2    12  1991    0.219
-## 5         759 Compound x 1991-12-03 00:00:00     3    12  1991    0.203
-## 6         759 Compound x 1991-12-04 00:00:00     4    12  1991    0.206
+## # A tibble: 6 × 4
+##   `Site code` Analyte    `Real date`         `mg/day`
+##         <dbl> <chr>      <dttm>                 <dbl>
+## 1         759 Compound x 1991-11-29 00:00:00    0.334
+## 2         759 Compound x 1991-11-30 00:00:00    0.231
+## 3         759 Compound x 1991-12-01 00:00:00    0.216
+## 4         759 Compound x 1991-12-02 00:00:00    0.219
+## 5         759 Compound x 1991-12-03 00:00:00    0.203
+## 6         759 Compound x 1991-12-04 00:00:00    0.206
 ```
+
 
 ### Bind several workbook sheets
 
@@ -120,11 +137,11 @@ Using the `map_dfr()` function makes sure we have a single dataframe as an outpu
 
 ```r
 # only keep sheet names that contain actual data
-sheets <- excel_sheets("Data workshop.xlsx")[2:3]
+sheets <- excel_sheets("data/analytes_data.xlsx")[2:3]
 # map the reading to each sheet
 library(purrr)
 analytes <- map_dfr(sheets,
-                    ~ read_excel("Data workshop.xlsx", sheet = .x))
+                    ~ read_excel("data/analytes_data.xlsx", sheet = .x))
 ```
 
 We could map a function by simply providing the name of the function. However, because we are doing something slightly more elaborate here (pointing to one single file, and using an extra argument to point to the sheet itself), we need to use the `~` syntax.
@@ -133,18 +150,42 @@ We could map a function by simply providing the name of the function. However, b
 
 ## Data cleaning
 
+There are a few issues with the dataset. First of all, there are variations in how the compoud is named. We can repalce the value in the first column with a simpler, consistent one:
+
 
 ```r
 # all same compound
 analytes$Analyte <- "x"
+```
 
-# easier names
+Our columns names are not the most reusable names for R. Better names do not contain spaces or special characters like `/`. dplyr's `rename()` function is very handy for that:
+
+
+```r
 library(dplyr)
-analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 7)
+analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 4)
+```
 
-# site shouldn't be numeric
+Finally, the Site column is stored as numeric data. If we plot it as it is, R will consider it to be a contiuous variable, when it really should be discrete. Let's fix that with dplyr's `mutate()` function:
+
+
+```r
 analytes <- mutate(analytes, Site = as.character(Site))
 ```
+
+> We could convert it to a factor instead, but the Tidyverse packages tend to be happy with categorical data stored as the character type.
+
+### Export a clean dataset
+
+We now have a clean dataset in a single table, which we could make a copy of, especially to share with others, or if we want to split our code into several scripts that can work independently.
+
+
+```r
+write.csv(analytes, "data/analytes_data_clean.csv",
+          row.names = FALSE)
+```
+
+> `write.csv()` will by default include a column of row names in the exported file, which are the row numbers if no row names have been assigned. That's not usually something we want, so we can turn it off with `row.names = FALSE`
 
 ## Quick viz of the data
 
@@ -156,7 +197,7 @@ ggplot(analytes,
   geom_line()
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 
 ```r
 # line plot is not great because of the periodicity (bursts of sampling)
@@ -168,7 +209,7 @@ ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
 ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-2.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="672" />
 
 ```r
 # careful: creates artificial dip in site 1335 to fit the data.
@@ -177,58 +218,30 @@ ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
 
 
 ```r
-chem <- read_csv("tailored_data_R.csv") 
-## Rows: 720 Columns: 4
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: ","
-## chr (2): Analyte, Date
-## dbl (2): Site code, mg/day
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-head(chem)
-## # A tibble: 6 × 4
-##   `Site code` Analyte   Date       `mg/day`
-##         <dbl> <chr>     <chr>         <dbl>
-## 1        1335 compund x 28/11/1991    0.253
-## 2        1335 compund x 29/11/1991    0.239
-## 3        1335 compund x 30/11/1991    0.197
-## 4        1335 compund x 1/12/1991     0.173
-## 5        1335 compund x 2/12/1991     0.222
-## 6        1335 compund x 3/12/1991     0.191
+# chem <- read_csv("tailored_data_R.csv") 
+# head(chem)
 ```
 
 Change columns to appropriate data type:
 
 
 ```r
-chem$`Site code` <- as.factor(chem$`Site code`)
-chem$Analyte <- as.factor(chem$Analyte)
-chem$Date <- as.Date(chem$Date, format =  "%d/%m/%Y")
-
-head(chem)
-## # A tibble: 6 × 4
-##   `Site code` Analyte   Date       `mg/day`
-##   <fct>       <fct>     <date>        <dbl>
-## 1 1335        compund x 1991-11-28    0.253
-## 2 1335        compund x 1991-11-29    0.239
-## 3 1335        compund x 1991-11-30    0.197
-## 4 1335        compund x 1991-12-01    0.173
-## 5 1335        compund x 1991-12-02    0.222
-## 6 1335        compund x 1991-12-03    0.191
+# chem$`Site code` <- as.factor(chem$`Site code`)
+# chem$Analyte <- as.factor(chem$Analyte)
+# chem$Date <- as.Date(chem$Date, format =  "%d/%m/%Y")
+# 
+# head(chem)
 ```
 
 ## Visualize the data
 
 
 ```r
-ggplot(data = chem,
-       aes(x = Date,
-           y = `mg/day`)) +
-   geom_point()
+# ggplot(data = chem,
+#        aes(x = Date,
+#            y = `mg/day`)) +
+#    geom_point()
 ```
-
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="672" />
 
 
 
