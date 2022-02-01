@@ -67,7 +67,7 @@ Sampling design: Atmospheric samples of the Compound X were collected each day d
 Let's download our dataset form the web:
 
 ```{r download data, eval=FALSE}
-download.file("https://github.com/seaCatKim/PACE-LIB-R-timeseries/raw/main/data/analytes_data.xlsx",
+download.file("https://github.com/seaCatKim/PACE-LIB-R-timeseries/raw/main/content/post/2020-12-01-part1-working-timeseries-data/data/analytes_data.xlsx",
               destfile = "data/analytes_data.xlsx")
 ```
 
@@ -129,7 +129,7 @@ analytes$Analyte <- "x"
 
 # easier names
 library(dplyr)
-analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 7)
+analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 4)
 
 # site shouldn't be numeric
 analytes <- mutate(analytes, Site = as.character(Site))
@@ -153,27 +153,27 @@ ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
 ```
 
 ```{r}
-chem <- read_csv("tailored_data_R.csv") 
-head(chem)
+# chem <- read_csv("tailored_data_R.csv") 
+# head(chem)
 ```
 
 Change columns to appropriate data type:
 
 ```{r}
-chem$`Site code` <- as.factor(chem$`Site code`)
-chem$Analyte <- as.factor(chem$Analyte)
-chem$Date <- as.Date(chem$Date, format =  "%d/%m/%Y")
-
-head(chem)
+# chem$`Site code` <- as.factor(chem$`Site code`)
+# chem$Analyte <- as.factor(chem$Analyte)
+# chem$Date <- as.Date(chem$Date, format =  "%d/%m/%Y")
+# 
+# head(chem)
 ```
 
 ## Visualize the data
 
 ```{r}
-ggplot(data = chem,
-       aes(x = Date,
-           y = `mg/day`)) +
-   geom_point()
+# ggplot(data = chem,
+#        aes(x = Date,
+#            y = `mg/day`)) +
+#    geom_point()
 ```
 
 
