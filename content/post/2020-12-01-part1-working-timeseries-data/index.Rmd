@@ -38,7 +38,12 @@ We are happy to have any and all questions though!
 
 ## What are we going to learn?
 
-In this hands-on session...
+In this first part of the workshop, we will learn how to:
+
+* Read data from multiple sheets into an object
+* Clean the data and extract information
+* Explore the data visually
+
 
 ## Load packages
 
@@ -54,21 +59,51 @@ Sampling design: Atmospheric samples of the Compound X were collected each day d
 
 ### Read in the data
 
+We have an XLSX workbook that contains several sheets. The first one is only documenting what the data is about, whereas the two other ones contain the data we are interested in.
+
+The package [readxl](https://readxl.tidyverse.org/) is useful for importing data stored in XLS and XLSX files. For example, to have a look at a single sheet of data, we can do the following:
+
 ```{r}
+# load the package
 library(readxl)
-# only one sheet
-analytes <- read_excel("Data workshop.xlsx", sheet = 2)
+# only import the second sheet
+analytes <- read_excel("tailored_data.xlsx", sheet = 2)
+```
+
+We could also point to the correct sheet by using the sheet name instead of its index. For that, the `excel_sheets()` function is useful to find the names:
+
+```{r}
 # excel_sheets() shows the sheet names
 excel_sheets("Data workshop.xlsx")
+analytes <- read_excel("tailored_data.xlsx", sheet = "Site_759")
 ```
 
-### Bind several excel sheets
+Let's have a look at the first few rows of data:
 
 ```{r}
+head(analytes)
+```
+
+### Bind several workbook sheets
+
+Even though this workbook only has two sheets of data, we might want to automate the reading and binding of all data sheets to avoid repeating code. This comes in very handy if you have a workbook with a dozen sheets of data, or if your data is split between several files.
+
+The purrr is a package that allows "mapping" functions (or set of operations) to several elements. Here, we will _map_ the reading of the sheet to each _element_ in a vector of sheet names.
+
+Using the `map_dfr()` function makes sure we have a single dataframe as an output.
+
+```{r}
+# only keep sheet names that contain actual data
+sheets <- excel_sheets("Data workshop.xlsx")[2:3]
+# map the reading to each sheet
 library(purrr)
-analytes <- map_dfr(excel_sheets("Data workshop.xlsx")[2:3],
+analytes <- map_dfr(sheets,
                     ~ read_excel("Data workshop.xlsx", sheet = .x))
 ```
+
+We could map a function by simply providing the name of the function. However, because we are doing something slightly more elaborate here (pointing to one single file, and using an extra argument to point to the sheet itself), we need to use the `~` syntax.
+
+> For more information on the different options the `map` family offers, see `?map`.
 
 ## Data cleaning
 
