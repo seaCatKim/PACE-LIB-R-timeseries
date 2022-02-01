@@ -150,18 +150,42 @@ We could map a function by simply providing the name of the function. However, b
 
 ## Data cleaning
 
+There are a few issues with the dataset. First of all, there are variations in how the compoud is named. We can repalce the value in the first column with a simpler, consistent one:
+
 
 ```r
 # all same compound
 analytes$Analyte <- "x"
+```
 
-# easier names
+Our columns names are not the most reusable names for R. Better names do not contain spaces or special characters like `/`. dplyr's `rename()` function is very handy for that:
+
+
+```r
 library(dplyr)
 analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 4)
+```
 
-# site shouldn't be numeric
+Finally, the Site column is stored as numeric data. If we plot it as it is, R will consider it to be a contiuous variable, when it really should be discrete. Let's fix that with dplyr's `mutate()` function:
+
+
+```r
 analytes <- mutate(analytes, Site = as.character(Site))
 ```
+
+> We could convert it to a factor instead, but the Tidyverse packages tend to be happy with categorical data stored as the character type.
+
+### Export a clean dataset
+
+We now have a clean dataset in a single table, which we could make a copy of, especially to share with others, or if we want to split our code into several scripts that can work independently.
+
+
+```r
+write.csv(analytes, "data/analytes_data_clean.csv",
+          row.names = FALSE)
+```
+
+> `write.csv()` will by default include a column of row names in the exported file, which are the row numbers if no row names have been assigned. That's not usually something we want, so we can turn it off with `row.names = FALSE`
 
 ## Quick viz of the data
 
@@ -173,7 +197,7 @@ ggplot(analytes,
   geom_line()
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 
 ```r
 # line plot is not great because of the periodicity (bursts of sampling)
@@ -185,7 +209,7 @@ ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
 ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-2.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="672" />
 
 ```r
 # careful: creates artificial dip in site 1335 to fit the data.
