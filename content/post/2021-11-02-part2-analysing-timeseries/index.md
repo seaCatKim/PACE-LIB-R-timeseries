@@ -42,32 +42,11 @@ In this hands-on session...
 
 ```r
 library(tidyverse)
-## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
-## v ggplot2 3.3.5     v purrr   0.3.4
-## v tibble  3.1.6     v dplyr   1.0.7
-## v tidyr   1.1.4     v stringr 1.4.0
-## v readr   2.0.1     v forcats 0.5.1
-## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()
 library(lubridate) # work with dates
-## 
-## Attaching package: 'lubridate'
-## The following objects are masked from 'package:base':
-## 
-##     date, intersect, setdiff, union
 library(readxl) # read excel files
 
 library(zoo)
-## 
-## Attaching package: 'zoo'
-## The following objects are masked from 'package:base':
-## 
-##     as.Date, as.Date.numeric
 library(forecast)
-## Registered S3 method overwritten by 'quantmod':
-##   method            from
-##   as.zoo.data.frame zoo
 ```
 
 ## About the data
@@ -266,7 +245,13 @@ The lines do not really follow the same pattern throughout the year - again, not
 
 ## Autocorrelation
 
-Correlograms, k lags on x-axis and the unit of lag is sampling interval (month here). Lag 0 correlation is always 1, helps to compare other lags
+### Autocorrelation plots
+
+Plot the **autocorrelation function** (ACF) correlogram for the time series. There are *k* lags on the x-axis and the unit of lag is sampling interval (month here). Lag 0 is always the theoretical maximum of 1 and helps to compare other lags. 
+
+The cutest explanation of ACF by Dr Allison Horst:
+
+![acf art by Allison Horst](acf_1.jpg)
 
 
 ```r
@@ -275,11 +260,39 @@ acf(s1335$mg_per_day)
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
 
+You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, there are 3 to 4 significant autocorrelation. The lags crossing the dotted blue line are statistically significant.
+
+
+The **partial autocorrelation function** can also be plotted. The partial correlation is the left over correlation at lag *k* between all data points that are *k* steps apart accounting for the correlation with the data between *k* steps.
+
+
 ```r
 pacf(s1335$mg_per_day)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-2.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+
+Practically, this can help us identify the number of autoregression (AR) coefficients in an autoregression integrated moving average (ARIMA) model. The above plot shows *k* = 3 so the initial ARIMA model will have three AR coefficients (AR(3)). The model will still require fitting and checking.
+
+### Autocorrelation test
+
+There is also the `base::Box.test()` function that can be used to test for autocorrelation:
+
+
+```r
+Box.test(ts_1335)
+## 
+## 	Box-Pierce test
+## 
+## data:  ts_1335
+## X-squared = 57.808, df = 1, p-value = 2.887e-14
+```
+
+The p-value is significant which means the data contains significant autocorrelations.
+
+## Stationarity
+
+Test for stationarity.
 
 
 ```r
@@ -300,7 +313,7 @@ kpss.test(ts_1335)
 ## KPSS Level = 0.2472, Truncation lag parameter = 4, p-value = 0.1
 ```
 
-Differencing
+## Differencing
 
 
 ```r
@@ -324,7 +337,7 @@ ar_1335$ar
 acf(ar_1335$res[-(1:ar_1335$order)], lag = 50) 
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
 
 ## regression
 
@@ -350,7 +363,7 @@ confint(chem.lm)
 acf(resid(chem.lm))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="672" />
 
 ## gls
 
@@ -376,7 +389,7 @@ confint(chem.gls)
 acf(resid(chem.gls))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="672" />
 
 ## seasonal component
 
@@ -395,7 +408,7 @@ coef(chem.lm)
 acf(resid(chem.lm))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
 
 ## ARIMA
 
@@ -406,7 +419,7 @@ plot(ts_1335)
 plot(diff(ts_1335))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
 
 
 ```r
@@ -419,4 +432,4 @@ seas = list(order = c(0,0,1), 12)))
 acf(resid(chem.arima), lag = 50)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
