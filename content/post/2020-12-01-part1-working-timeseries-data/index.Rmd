@@ -353,7 +353,7 @@ This method might not be the best for this data, but it proves very useful in ot
 
 ## Next: part 2
 
-In [Part 2](2022/01/27/timeseries-data/), you will learn about analysing time series data.
+In [Part 2](/2022/01/27/analysing/), you will learn about analysing time series data.
 
 ````{comment}
 
