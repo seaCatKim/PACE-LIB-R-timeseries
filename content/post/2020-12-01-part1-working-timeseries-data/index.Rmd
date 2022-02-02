@@ -289,6 +289,57 @@ This is a lot cleaner than what we had originally!
 
 ## Export summarised data
 
+We have previously exported a CSV, which is a great, simple format that can be opened pretty much anywhere. However, if you want to save an R object to reopen it exactly as it was, you can use an R-specific format like RData.
+
+```{r export RData}
+save(analytes_summary, file = "data/summary.RData")
+```
+
+The file can then be imported again with the `load()` function. You won't need to convert the columns to the correct data type again.
+
+## Interactive visualisation
+
+Exploring timelines might be more comfortable with an interactive visualisation. [Plotly](https://plotly.com/r/) is a helpful library available for various programming languages, and the plotly package makes it easy to use it in R.
+
+Once a visualisation is created in R, it is trivial to convert it to a Plotly visualisation with one single function: `ggplotly()`.
+
+```{r ggplotly}
+# save as an object
+p <- ggplot(analytes_summary,
+       aes(x = Date,
+           y = mg_per_day,
+           colour = Site)) +
+  geom_line()
+# turn it into a plotly visualisation
+library(plotly)
+ggplotly(p)
+```
+
+To focus on a section, draw a rectangle (and double-click to reset to the full view).
 
 
 
+With several time series plotted, it is useful to change the hover setting to "compare data on hover" with this button:
+
+!["Compare data on hover" button in Plotly visualisation](images/compare_button.png)
+
+It is however possible to set a similar hover mode as a default:
+
+```{r hovermode}
+ggplotly(p) %>% 
+   layout(hovermode = "x unified")
+```
+
+
+````{comment}
+
+(This section is commented out as the feature seems broken currently.)
+
+Another helpful functionality is the ability to add a slider to restrict the time range:
+
+```{r}
+ggplotly(p) %>% 
+   rangeslider()
+```
+
+````

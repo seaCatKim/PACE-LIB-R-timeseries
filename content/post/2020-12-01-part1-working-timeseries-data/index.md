@@ -13,21 +13,35 @@ output:
     number_sections: TRUE
 ---
 
-
+<script src="{{< blogdown/postref >}}index_files/htmlwidgets/htmlwidgets.js"></script>
+<script src="{{< blogdown/postref >}}index_files/plotly-binding/plotly.js"></script>
+<script src="{{< blogdown/postref >}}index_files/typedarray/typedarray.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/jquery/jquery.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/crosstalk/js/crosstalk.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/plotly-main/plotly-latest.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/htmlwidgets/htmlwidgets.js"></script>
+<script src="{{< blogdown/postref >}}index_files/plotly-binding/plotly.js"></script>
+<script src="{{< blogdown/postref >}}index_files/typedarray/typedarray.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/jquery/jquery.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/crosstalk/js/crosstalk.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/plotly-main/plotly-latest.min.js"></script>
 
 **Stéphane Guillou**
 
 Technology Trainer, The University of Queensland Library
 
-
-## Prerequisites 
+## Prerequisites
 
 This R workshop assumes basic knowledge of R including:
 
-* Installing and loading packages
-* How to read in data with `read.csv()`, `readr::read_csv()` and similar
-* Creating objects in R
-* How to transform data frames and tibbles with `dplyr`
+-   Installing and loading packages
+-   How to read in data with `read.csv()`, `readr::read_csv()` and similar
+-   Creating objects in R
+-   How to transform data frames and tibbles with `dplyr`
 
 We are happy to have any and all questions though!
 
@@ -35,24 +49,23 @@ We are happy to have any and all questions though!
 
 In this first part of the workshop, we will learn how to:
 
-* Read data from multiple sheets into an object
-* Clean the data and extract information
-* Explore the data visually
+-   Read data from multiple sheets into an object
+-   Clean the data and extract information
+-   Explore the data visually
 
 ## Create a project
 
 To work cleanly, we need to:
 
-* Create a new project in RStudio
-* Create a new script to write our R code
-* Create a data directory to store our data in
+-   Create a new project in RStudio
+-   Create a new script to write our R code
+-   Create a data directory to store our data in
 
 ## Load packages
 
 For this workshop, we will use many tools from the Tidyverse: a collection of packages for data import, transformation, visualisation and export.
 
-
-```r
+``` r
 library(tidyverse)
 ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -70,10 +83,9 @@ Sampling design: Atmospheric samples of the Compound X were collected each day d
 
 ### Download the data
 
-Let's download our dataset form the web:
+Let’s download our dataset form the web:
 
-
-```r
+``` r
 download.file("https://github.com/seaCatKim/PACE-LIB-R-timeseries/raw/main/content/post/2020-12-01-part1-working-timeseries-data/data/analytes_data.xlsx",
               destfile = "data/analytes_data.xlsx")
 ```
@@ -84,8 +96,7 @@ We have an XLSX workbook that contains several sheets. The first one is only doc
 
 The package [readxl](https://readxl.tidyverse.org/) is useful for importing data stored in XLS and XLSX files. For example, to have a look at a single sheet of data, we can do the following:
 
-
-```r
+``` r
 # load the package
 library(readxl)
 # only import the second sheet
@@ -95,18 +106,16 @@ analytes <- read_excel("data/analytes_data.xlsx",
 
 We could also point to the correct sheet by using the sheet name instead of its index. For that, the `excel_sheets()` function is useful to find the names:
 
-
-```r
+``` r
 # excel_sheets() shows the sheet names
 excel_sheets("data/analytes_data.xlsx")
 ## [1] "infromation data " "Site_759"          "Site_1335"
 analytes <- read_excel("data/analytes_data.xlsx", sheet = "Site_759")
 ```
 
-Let's have a look at the first few rows of data:
+Let’s have a look at the first few rows of data:
 
-
-```r
+``` r
 head(analytes)
 ## # A tibble: 6 × 4
 ##   `Site code` Analyte    `Real date`         `mg/day`
@@ -119,17 +128,15 @@ head(analytes)
 ## 6         759 Compound x 1991-12-04 00:00:00    0.206
 ```
 
-
 ### Bind several workbook sheets
 
 Even though this workbook only has two sheets of data, we might want to automate the reading and binding of all data sheets to avoid repeating code. This comes in very handy if you have a workbook with a dozen sheets of data, or if your data is split between several files.
 
-The purrr package allows "mapping" a function (or a more complex command) to several elements. Here, we will _map_ the reading of the sheet to each _element_ in a vector of sheet names.
+The purrr package allows “mapping” a function (or a more complex command) to several elements. Here, we will *map* the reading of the sheet to each *element* in a vector of sheet names.
 
 Using the `map_dfr()` function makes sure we have a single data frame as an output.
 
-
-```r
+``` r
 # only keep sheet names that contain actual data
 sheets <- excel_sheets("data/analytes_data.xlsx")[2:3]
 # map the reading to each sheet
@@ -146,24 +153,21 @@ We could map a function by simply providing the name of the function. However, b
 
 There are a few issues with the dataset. First of all, there are variations in how the compound is named. We can replace the value in the first column with a simpler, consistent one:
 
-
-```r
+``` r
 # all same compound
 analytes$Analyte <- "x"
 ```
 
-Our column names are not the most reusable names for R. Better names do not contain spaces or special characters like `/`. dplyr's `rename()` function is very handy for that:
+Our column names are not the most reusable names for R. Better names do not contain spaces or special characters like `/`. dplyr’s `rename()` function is very handy for that:
 
-
-```r
+``` r
 library(dplyr)
 analytes <- rename(analytes, Site = 1, Date = 3, mg_per_day = 4)
 ```
 
-Finally, the Site column is stored as numeric data. If we plot it as it is, R will consider it to be a continuous variable, when it really should be discrete. Let's fix that with dplyr's `mutate()` function:
+Finally, the Site column is stored as numeric data. If we plot it as it is, R will consider it to be a continuous variable, when it really should be discrete. Let’s fix that with dplyr’s `mutate()` function:
 
-
-```r
+``` r
 analytes <- mutate(analytes, Site = as.character(Site))
 ```
 
@@ -173,13 +177,12 @@ analytes <- mutate(analytes, Site = as.character(Site))
 
 We now have a clean dataset in a single table, which we could make a copy of, especially to share with others, or if we want to split our code into several scripts that can work independently.
 
-
-```r
+``` r
 write.csv(analytes, "data/analytes_data_clean.csv",
           row.names = FALSE)
 ```
 
-> `write.csv()` will by default include a column of row names in the exported file, which are the row numbers if no row names have been assigned. That's not usually something we want, so we can turn it off with `row.names = FALSE`
+> `write.csv()` will by default include a column of row names in the exported file, which are the row numbers if no row names have been assigned. That’s not usually something we want, so we can turn it off with `row.names = FALSE`
 
 ## Visualisation with ggplot2
 
@@ -187,14 +190,13 @@ At this stage, we can start exploring visually. For a lot of R users, the go-to 
 
 For a ggplot2 visualisation, rememember that we usually need this three essential elements:
 
-* the dataset
-* the mapping of aesthetic elements to variables in the dataset
-* the geometry used to represent the data
+-   the dataset
+-   the mapping of aesthetic elements to variables in the dataset
+-   the geometry used to represent the data
 
-Let's try a first timeline visualisation with a line plot:
+Let’s try a first timeline visualisation with a line plot:
 
-
-```r
+``` r
 library(ggplot2)
 ggplot(analytes,             # data
        aes(x = Date,         # mapping of aesthetics
@@ -207,10 +209,9 @@ ggplot(analytes,             # data
 
 A simple line plot is not great here, because of the periodicity: there were bursts of sampling, several days in a row, and then nothing for a while. Which results in a fine, daily resolution for small periods of time, and a straight line joining these periods of time.
 
-We might want to "smoothen" that line, hoping to get a better idea of the trend, keeping the original data as points in the background:
+We might want to “smoothen” that line, hoping to get a better idea of the trend, keeping the original data as points in the background:
 
-
-```r
+``` r
 ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
   geom_point() +
   geom_smooth()
@@ -221,8 +222,7 @@ ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
 
 The trend lines only give a very general trend. What if we make it follow the points more closely?
 
-
-```r
+``` r
 ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
   geom_point(size = 0.3) + # smaller points
   geom_smooth(span = 0.05) # follow the data more closely
@@ -231,18 +231,17 @@ ggplot(analytes, aes(x = Date, y = mg_per_day, colour = Site)) +
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
 
-With the method used, we end up with an increased uncertainty (the shaded area around the curves). It also creates artificial "dips" to fit the data, for example close to the beginning of 2000 for the site 1335.
+With the method used, we end up with an increased uncertainty (the shaded area around the curves). It also creates artificial “dips” to fit the data, for example close to the beginning of 2000 for the site 1335.
 
 ## Summarise the data
 
 In this case, because we have sampling points for what looks like groups of successive days, we can try to summarise them.
 
-Operations on time-date data can be done more comfortably with extra packages. The Tidyverse comes with the lubridate package, which has been around for a while and is very powerful. Another, more recent package called "[clock](https://clock.r-lib.org/)" can do most of what lubridate can, and more, but it is still being heavily developped, so we stick to lubridate here.
+Operations on time-date data can be done more comfortably with extra packages. The Tidyverse comes with the lubridate package, which has been around for a while and is very powerful. Another, more recent package called “[clock](https://clock.r-lib.org/)” can do most of what lubridate can, and more, but it is still being heavily developped, so we stick to lubridate here.
 
-Let's start by extracting all the date components that could be useful:
+Let’s start by extracting all the date components that could be useful:
 
-
-```r
+``` r
 library(lubridate)
 ## 
 ## Attaching package: 'lubridate'
@@ -259,8 +258,7 @@ analytes <- analytes %>%
 
 How many sampling days per month are there?
 
-
-```r
+``` r
 analytes %>% 
    group_by(Site, year, month) %>% 
    count() %>% 
@@ -284,10 +282,9 @@ analytes %>%
 
 The number of samples per month is irregular, and some months have no data.
 
-Furthermore, the week numbers don't align with the sampling weeks, and some sampling weeks overlap over two months:
+Furthermore, the week numbers don’t align with the sampling weeks, and some sampling weeks overlap over two months:
 
-
-```r
+``` r
 analytes %>%  select(year, month, day, week) %>%  head(10)
 ## # A tibble: 10 × 4
 ##     year month   day  week
@@ -304,12 +301,11 @@ analytes %>%  select(year, month, day, week) %>%  head(10)
 ## 10  1992     2     2     5
 ```
 
-In any case, the fact that week numbers are reset at the beginning of the year wouldn't help.
+In any case, the fact that week numbers are reset at the beginning of the year wouldn’t help.
 
 One way to group the sampling days together is to detect which ones are spaced by one day, and which ones by a lot more:
 
-
-```r
+``` r
 analytes <- analytes %>%
    arrange(Site, Date) %>% # make sure it is in chronological order
    group_by(Site) %>% # deal with sites separately
@@ -319,10 +315,9 @@ analytes <- analytes %>%
 
 > Grouping by site is important, otherwise we get an erroneous value at the row after switching to the second site. Because we grouped, it does not compare to the previous value in the different site, but instead only returns an `NA`.
 
-How consistent are the sampling periods? Let's investigate:
+How consistent are the sampling periods? Let’s investigate:
 
-
-```r
+``` r
 analytes %>% 
    count(days_lapsed) %>% 
    head()
@@ -337,12 +332,11 @@ analytes %>%
 ## 6          43     5
 ```
 
-It looks like some sampling days might have been missed, so we can define a sampling period as "a period in which sampling times are not spaced by more than 3 days".
+It looks like some sampling days might have been missed, so we can define a sampling period as “a period in which sampling times are not spaced by more than 3 days.”
 
 To create a grouping index, we can first assign a value of `TRUE` to the first row of each time period, and then use the cumulative sum function on that column (as it converts `TRUE`s to 1s and `FALSE`s to 0s):
 
-
-```r
+``` r
 analytes <- analytes %>% 
    group_by(Site) %>%
    mutate(sampling_period = row_number() == 1 | days_lapsed > 3,
@@ -352,8 +346,7 @@ analytes <- analytes %>%
 
 We can now use these new group indices to summarise by time period:
 
-
-```r
+``` r
 analytes_summary <- analytes %>% 
    group_by(Analyte, Site, sampling_period) %>% # we are keeping Analyte
    summarise(Date = round_date(mean(Date), unit = "day"),
@@ -363,10 +356,9 @@ analytes_summary <- analytes %>%
 ## the `.groups` argument.
 ```
 
-Let's try again our line plot with the summarised data:
+Let’s try again our line plot with the summarised data:
 
-
-```r
+``` r
 ggplot(analytes_summary,
        aes(x = Date,
            y = mg_per_day,
@@ -380,6 +372,58 @@ This is a lot cleaner than what we had originally!
 
 ## Export summarised data
 
+We have previously exported a CSV, which is a great, simple format that can be opened pretty much anywhere. However, if you want to save an R object to reopen it exactly as it was, you can use an R-specific format like RData.
 
+``` r
+save(analytes_summary, file = "data/summary.RData")
+```
 
+The file can then be imported again with the `load()` function. You won’t need to convert the columns to the correct data type again.
 
+## Interactive visualisation
+
+Exploring timelines might be more comfortable with an interactive visualisation. [Plotly](https://plotly.com/r/) is a helpful library available for various programming languages, and the plotly package makes it easy to use it in R.
+
+Once a visualisation is created in R, it is trivial to convert it to a Plotly visualisation with one single function: `ggplotly()`.
+
+``` r
+# save as an object
+p <- ggplot(analytes_summary,
+       aes(x = Date,
+           y = mg_per_day,
+           colour = Site)) +
+  geom_line()
+# turn it into a plotly visualisation
+library(plotly)
+## 
+## Attaching package: 'plotly'
+## The following object is masked from 'package:ggplot2':
+## 
+##     last_plot
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## The following object is masked from 'package:graphics':
+## 
+##     layout
+ggplotly(p)
+```
+
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"data":[{"x":[691545600,696988800,701913600,707270400,712713600,718243200,723600000,729043200,734659200,739324800,744768000,749606400,755049600,760492800,765331200,770774400,776044800,781401600,786585600,791942400,797990400,802137600,807667200,813715200,817948800,823392000,828748800,834278400,839116800,845078400,849312000,855360000,860198400,865641600,870739200,876182400,881020800,887068800,891907200,896745600,902966400,912470400,917913600,923356800,928281600,934070400,949363200,954806400,959644800,966038400,969926400],"y":[0.212600968404053,0.264098233266516,0.19269961796989,0.215749485604517,0.269053702856392,0.188344509093252,0.0949463064249318,0.163510674899607,0.208070044896479,0.24936087095228,0.269213572913539,0.264486560569199,0.370149548926033,0.331779295272988,0.328276542520932,0.324670684704295,0.268652378778703,0.313608945535038,0.267736905121743,0.344811409092583,0.342356790274702,0.451976991428665,0.446694323908587,0.3720674476949,0.468439501884643,0.334363194275963,0.382415555384546,0.385704980315966,0.466012762586555,0.654577489229594,0.665716883611786,0.571680514672521,0.407246865737372,0.411953790844082,0.508630238281375,0.609210899199135,0.671177589549717,0.84627446475425,0.261167153171242,0.25104041758912,0.324209206396599,0.457869334439024,0.357103665788697,0.32072347010418,0.273745886060628,0.358377992714145,0.466406915721393,0.482077358364403,0.260096459565358,0.244787297581133,0.189378182414287],"text":["Date: 1991-12-01<br />mg_per_day: 0.21260097<br />Site: 1335","Date: 1992-02-02<br />mg_per_day: 0.26409823<br />Site: 1335","Date: 1992-03-30<br />mg_per_day: 0.19269962<br />Site: 1335","Date: 1992-05-31<br />mg_per_day: 0.21574949<br />Site: 1335","Date: 1992-08-02<br />mg_per_day: 0.26905370<br />Site: 1335","Date: 1992-10-05<br />mg_per_day: 0.18834451<br />Site: 1335","Date: 1992-12-06<br />mg_per_day: 0.09494631<br />Site: 1335","Date: 1993-02-07<br />mg_per_day: 0.16351067<br />Site: 1335","Date: 1993-04-13<br />mg_per_day: 0.20807004<br />Site: 1335","Date: 1993-06-06<br />mg_per_day: 0.24936087<br />Site: 1335","Date: 1993-08-08<br />mg_per_day: 0.26921357<br />Site: 1335","Date: 1993-10-03<br />mg_per_day: 0.26448656<br />Site: 1335","Date: 1993-12-05<br />mg_per_day: 0.37014955<br />Site: 1335","Date: 1994-02-06<br />mg_per_day: 0.33177930<br />Site: 1335","Date: 1994-04-03<br />mg_per_day: 0.32827654<br />Site: 1335","Date: 1994-06-05<br />mg_per_day: 0.32467068<br />Site: 1335","Date: 1994-08-05<br />mg_per_day: 0.26865238<br />Site: 1335","Date: 1994-10-06<br />mg_per_day: 0.31360895<br />Site: 1335","Date: 1994-12-05<br />mg_per_day: 0.26773691<br />Site: 1335","Date: 1995-02-05<br />mg_per_day: 0.34481141<br />Site: 1335","Date: 1995-04-16<br />mg_per_day: 0.34235679<br />Site: 1335","Date: 1995-06-03<br />mg_per_day: 0.45197699<br />Site: 1335","Date: 1995-08-06<br />mg_per_day: 0.44669432<br />Site: 1335","Date: 1995-10-15<br />mg_per_day: 0.37206745<br />Site: 1335","Date: 1995-12-03<br />mg_per_day: 0.46843950<br />Site: 1335","Date: 1996-02-04<br />mg_per_day: 0.33436319<br />Site: 1335","Date: 1996-04-06<br />mg_per_day: 0.38241556<br />Site: 1335","Date: 1996-06-09<br />mg_per_day: 0.38570498<br />Site: 1335","Date: 1996-08-04<br />mg_per_day: 0.46601276<br />Site: 1335","Date: 1996-10-12<br />mg_per_day: 0.65457749<br />Site: 1335","Date: 1996-11-30<br />mg_per_day: 0.66571688<br />Site: 1335","Date: 1997-02-08<br />mg_per_day: 0.57168051<br />Site: 1335","Date: 1997-04-05<br />mg_per_day: 0.40724687<br />Site: 1335","Date: 1997-06-07<br />mg_per_day: 0.41195379<br />Site: 1335","Date: 1997-08-05<br />mg_per_day: 0.50863024<br />Site: 1335","Date: 1997-10-07<br />mg_per_day: 0.60921090<br />Site: 1335","Date: 1997-12-02<br />mg_per_day: 0.67117759<br />Site: 1335","Date: 1998-02-10<br />mg_per_day: 0.84627446<br />Site: 1335","Date: 1998-04-07<br />mg_per_day: 0.26116715<br />Site: 1335","Date: 1998-06-02<br />mg_per_day: 0.25104042<br />Site: 1335","Date: 1998-08-13<br />mg_per_day: 0.32420921<br />Site: 1335","Date: 1998-12-01<br />mg_per_day: 0.45786933<br />Site: 1335","Date: 1999-02-02<br />mg_per_day: 0.35710367<br />Site: 1335","Date: 1999-04-06<br />mg_per_day: 0.32072347<br />Site: 1335","Date: 1999-06-02<br />mg_per_day: 0.27374589<br />Site: 1335","Date: 1999-08-08<br />mg_per_day: 0.35837799<br />Site: 1335","Date: 2000-02-01<br />mg_per_day: 0.46640692<br />Site: 1335","Date: 2000-04-04<br />mg_per_day: 0.48207736<br />Site: 1335","Date: 2000-05-30<br />mg_per_day: 0.26009646<br />Site: 1335","Date: 2000-08-12<br />mg_per_day: 0.24478730<br />Site: 1335","Date: 2000-09-26<br />mg_per_day: 0.18937818<br />Site: 1335"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"1335","legendgroup":"1335","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[691632000,697075200,701827200,707270400,712713600,718329600,723600000,729043200,734486400,739324800,744768000,749606400,755049600,760492800,765244800,770774400,776044800,781315200,786585600,791942400,798076800,802224000,807667200,813715200,817948800,823392000,828748800,834278400,839635200,845078400,849312000,855360000,860198400,865641600,870652800,876182400,881020800,887068800,891907200,896745600,903225600,907632000,912470400,917913600,923356800,928281600,933984000,938476800,943920000,949363200,954806400,959644800,965174400,969926400],"y":[0.240643234328402,0.239866565002718,0.211103397811454,0.260162353840332,0.304296247670793,0.269262207504279,0.158852727378311,0.194866033857096,0.236929477428102,0.278617742780945,0.344656900580159,0.338663781964189,0.343149057634364,0.401927292639152,0.378457779333745,0.476518673518538,0.376610754347694,0.392942264401925,0.349698657067696,0.42331136112791,0.471299730954495,0.427908669452204,0.498963306529792,0.468227214282493,0.601436677281373,0.49164044871491,0.545712898647491,0.524188662920043,0.575373252340876,0.76791108278992,0.704379560335598,0.577035107328985,0.507615303671166,0.474351850103901,0.840092255145847,1.14889595102964,0.950474749192172,0.972511630492929,0.475151808458954,0.463213732343174,0.591410974995349,0.648980807337117,0.728667427053717,0.61270664975639,0.525029067129478,0.407787073625081,0.483586950750504,0.540148579053444,0.606263354707929,0.614667983173169,0.603191258313058,0.558189620049785,0.332048404115157,0.259511846965015],"text":["Date: 1991-12-02<br />mg_per_day: 0.24064323<br />Site: 759","Date: 1992-02-03<br />mg_per_day: 0.23986657<br />Site: 759","Date: 1992-03-29<br />mg_per_day: 0.21110340<br />Site: 759","Date: 1992-05-31<br />mg_per_day: 0.26016235<br />Site: 759","Date: 1992-08-02<br />mg_per_day: 0.30429625<br />Site: 759","Date: 1992-10-06<br />mg_per_day: 0.26926221<br />Site: 759","Date: 1992-12-06<br />mg_per_day: 0.15885273<br />Site: 759","Date: 1993-02-07<br />mg_per_day: 0.19486603<br />Site: 759","Date: 1993-04-11<br />mg_per_day: 0.23692948<br />Site: 759","Date: 1993-06-06<br />mg_per_day: 0.27861774<br />Site: 759","Date: 1993-08-08<br />mg_per_day: 0.34465690<br />Site: 759","Date: 1993-10-03<br />mg_per_day: 0.33866378<br />Site: 759","Date: 1993-12-05<br />mg_per_day: 0.34314906<br />Site: 759","Date: 1994-02-06<br />mg_per_day: 0.40192729<br />Site: 759","Date: 1994-04-02<br />mg_per_day: 0.37845778<br />Site: 759","Date: 1994-06-05<br />mg_per_day: 0.47651867<br />Site: 759","Date: 1994-08-05<br />mg_per_day: 0.37661075<br />Site: 759","Date: 1994-10-05<br />mg_per_day: 0.39294226<br />Site: 759","Date: 1994-12-05<br />mg_per_day: 0.34969866<br />Site: 759","Date: 1995-02-05<br />mg_per_day: 0.42331136<br />Site: 759","Date: 1995-04-17<br />mg_per_day: 0.47129973<br />Site: 759","Date: 1995-06-04<br />mg_per_day: 0.42790867<br />Site: 759","Date: 1995-08-06<br />mg_per_day: 0.49896331<br />Site: 759","Date: 1995-10-15<br />mg_per_day: 0.46822721<br />Site: 759","Date: 1995-12-03<br />mg_per_day: 0.60143668<br />Site: 759","Date: 1996-02-04<br />mg_per_day: 0.49164045<br />Site: 759","Date: 1996-04-06<br />mg_per_day: 0.54571290<br />Site: 759","Date: 1996-06-09<br />mg_per_day: 0.52418866<br />Site: 759","Date: 1996-08-10<br />mg_per_day: 0.57537325<br />Site: 759","Date: 1996-10-12<br />mg_per_day: 0.76791108<br />Site: 759","Date: 1996-11-30<br />mg_per_day: 0.70437956<br />Site: 759","Date: 1997-02-08<br />mg_per_day: 0.57703511<br />Site: 759","Date: 1997-04-05<br />mg_per_day: 0.50761530<br />Site: 759","Date: 1997-06-07<br />mg_per_day: 0.47435185<br />Site: 759","Date: 1997-08-04<br />mg_per_day: 0.84009226<br />Site: 759","Date: 1997-10-07<br />mg_per_day: 1.14889595<br />Site: 759","Date: 1997-12-02<br />mg_per_day: 0.95047475<br />Site: 759","Date: 1998-02-10<br />mg_per_day: 0.97251163<br />Site: 759","Date: 1998-04-07<br />mg_per_day: 0.47515181<br />Site: 759","Date: 1998-06-02<br />mg_per_day: 0.46321373<br />Site: 759","Date: 1998-08-16<br />mg_per_day: 0.59141097<br />Site: 759","Date: 1998-10-06<br />mg_per_day: 0.64898081<br />Site: 759","Date: 1998-12-01<br />mg_per_day: 0.72866743<br />Site: 759","Date: 1999-02-02<br />mg_per_day: 0.61270665<br />Site: 759","Date: 1999-04-06<br />mg_per_day: 0.52502907<br />Site: 759","Date: 1999-06-02<br />mg_per_day: 0.40778707<br />Site: 759","Date: 1999-08-07<br />mg_per_day: 0.48358695<br />Site: 759","Date: 1999-09-28<br />mg_per_day: 0.54014858<br />Site: 759","Date: 1999-11-30<br />mg_per_day: 0.60626335<br />Site: 759","Date: 2000-02-01<br />mg_per_day: 0.61466798<br />Site: 759","Date: 2000-04-04<br />mg_per_day: 0.60319126<br />Site: 759","Date: 2000-05-30<br />mg_per_day: 0.55818962<br />Site: 759","Date: 2000-08-02<br />mg_per_day: 0.33204840<br />Site: 759","Date: 2000-09-26<br />mg_per_day: 0.25951185<br />Site: 759"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"759","legendgroup":"759","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":43.1050228310502},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[677626560,983845440],"tickmode":"array","ticktext":["1992","1994","1996","1998","2000"],"tickvals":[694224000,757382400,820454400,883612800,946684800],"categoryorder":"array","categoryarray":["1992","1994","1996","1998","2000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.0422488241946963,1.20159343325988],"tickmode":"array","ticktext":["0.3","0.6","0.9","1.2"],"tickvals":[0.3,0.6,0.9,1.2],"categoryorder":"array","categoryarray":["0.3","0.6","0.9","1.2"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"mg_per_day","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"title":{"text":"Site","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"4a1518688a24":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"4a1518688a24","visdat":{"4a1518688a24":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+To focus on a section, draw a rectangle (and double-click to reset to the full view).
+
+With several time series plotted, it is useful to change the hover setting to “compare data on hover” with this button:
+
+![“Compare data on hover” button in Plotly visualisation](images/compare_button.png)
+
+It is however possible to set a similar hover mode as a default:
+
+``` r
+ggplotly(p) %>% 
+   layout(hovermode = "x unified")
+```
+
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"data":[{"x":[691545600,696988800,701913600,707270400,712713600,718243200,723600000,729043200,734659200,739324800,744768000,749606400,755049600,760492800,765331200,770774400,776044800,781401600,786585600,791942400,797990400,802137600,807667200,813715200,817948800,823392000,828748800,834278400,839116800,845078400,849312000,855360000,860198400,865641600,870739200,876182400,881020800,887068800,891907200,896745600,902966400,912470400,917913600,923356800,928281600,934070400,949363200,954806400,959644800,966038400,969926400],"y":[0.212600968404053,0.264098233266516,0.19269961796989,0.215749485604517,0.269053702856392,0.188344509093252,0.0949463064249318,0.163510674899607,0.208070044896479,0.24936087095228,0.269213572913539,0.264486560569199,0.370149548926033,0.331779295272988,0.328276542520932,0.324670684704295,0.268652378778703,0.313608945535038,0.267736905121743,0.344811409092583,0.342356790274702,0.451976991428665,0.446694323908587,0.3720674476949,0.468439501884643,0.334363194275963,0.382415555384546,0.385704980315966,0.466012762586555,0.654577489229594,0.665716883611786,0.571680514672521,0.407246865737372,0.411953790844082,0.508630238281375,0.609210899199135,0.671177589549717,0.84627446475425,0.261167153171242,0.25104041758912,0.324209206396599,0.457869334439024,0.357103665788697,0.32072347010418,0.273745886060628,0.358377992714145,0.466406915721393,0.482077358364403,0.260096459565358,0.244787297581133,0.189378182414287],"text":["Date: 1991-12-01<br />mg_per_day: 0.21260097<br />Site: 1335","Date: 1992-02-02<br />mg_per_day: 0.26409823<br />Site: 1335","Date: 1992-03-30<br />mg_per_day: 0.19269962<br />Site: 1335","Date: 1992-05-31<br />mg_per_day: 0.21574949<br />Site: 1335","Date: 1992-08-02<br />mg_per_day: 0.26905370<br />Site: 1335","Date: 1992-10-05<br />mg_per_day: 0.18834451<br />Site: 1335","Date: 1992-12-06<br />mg_per_day: 0.09494631<br />Site: 1335","Date: 1993-02-07<br />mg_per_day: 0.16351067<br />Site: 1335","Date: 1993-04-13<br />mg_per_day: 0.20807004<br />Site: 1335","Date: 1993-06-06<br />mg_per_day: 0.24936087<br />Site: 1335","Date: 1993-08-08<br />mg_per_day: 0.26921357<br />Site: 1335","Date: 1993-10-03<br />mg_per_day: 0.26448656<br />Site: 1335","Date: 1993-12-05<br />mg_per_day: 0.37014955<br />Site: 1335","Date: 1994-02-06<br />mg_per_day: 0.33177930<br />Site: 1335","Date: 1994-04-03<br />mg_per_day: 0.32827654<br />Site: 1335","Date: 1994-06-05<br />mg_per_day: 0.32467068<br />Site: 1335","Date: 1994-08-05<br />mg_per_day: 0.26865238<br />Site: 1335","Date: 1994-10-06<br />mg_per_day: 0.31360895<br />Site: 1335","Date: 1994-12-05<br />mg_per_day: 0.26773691<br />Site: 1335","Date: 1995-02-05<br />mg_per_day: 0.34481141<br />Site: 1335","Date: 1995-04-16<br />mg_per_day: 0.34235679<br />Site: 1335","Date: 1995-06-03<br />mg_per_day: 0.45197699<br />Site: 1335","Date: 1995-08-06<br />mg_per_day: 0.44669432<br />Site: 1335","Date: 1995-10-15<br />mg_per_day: 0.37206745<br />Site: 1335","Date: 1995-12-03<br />mg_per_day: 0.46843950<br />Site: 1335","Date: 1996-02-04<br />mg_per_day: 0.33436319<br />Site: 1335","Date: 1996-04-06<br />mg_per_day: 0.38241556<br />Site: 1335","Date: 1996-06-09<br />mg_per_day: 0.38570498<br />Site: 1335","Date: 1996-08-04<br />mg_per_day: 0.46601276<br />Site: 1335","Date: 1996-10-12<br />mg_per_day: 0.65457749<br />Site: 1335","Date: 1996-11-30<br />mg_per_day: 0.66571688<br />Site: 1335","Date: 1997-02-08<br />mg_per_day: 0.57168051<br />Site: 1335","Date: 1997-04-05<br />mg_per_day: 0.40724687<br />Site: 1335","Date: 1997-06-07<br />mg_per_day: 0.41195379<br />Site: 1335","Date: 1997-08-05<br />mg_per_day: 0.50863024<br />Site: 1335","Date: 1997-10-07<br />mg_per_day: 0.60921090<br />Site: 1335","Date: 1997-12-02<br />mg_per_day: 0.67117759<br />Site: 1335","Date: 1998-02-10<br />mg_per_day: 0.84627446<br />Site: 1335","Date: 1998-04-07<br />mg_per_day: 0.26116715<br />Site: 1335","Date: 1998-06-02<br />mg_per_day: 0.25104042<br />Site: 1335","Date: 1998-08-13<br />mg_per_day: 0.32420921<br />Site: 1335","Date: 1998-12-01<br />mg_per_day: 0.45786933<br />Site: 1335","Date: 1999-02-02<br />mg_per_day: 0.35710367<br />Site: 1335","Date: 1999-04-06<br />mg_per_day: 0.32072347<br />Site: 1335","Date: 1999-06-02<br />mg_per_day: 0.27374589<br />Site: 1335","Date: 1999-08-08<br />mg_per_day: 0.35837799<br />Site: 1335","Date: 2000-02-01<br />mg_per_day: 0.46640692<br />Site: 1335","Date: 2000-04-04<br />mg_per_day: 0.48207736<br />Site: 1335","Date: 2000-05-30<br />mg_per_day: 0.26009646<br />Site: 1335","Date: 2000-08-12<br />mg_per_day: 0.24478730<br />Site: 1335","Date: 2000-09-26<br />mg_per_day: 0.18937818<br />Site: 1335"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"1335","legendgroup":"1335","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[691632000,697075200,701827200,707270400,712713600,718329600,723600000,729043200,734486400,739324800,744768000,749606400,755049600,760492800,765244800,770774400,776044800,781315200,786585600,791942400,798076800,802224000,807667200,813715200,817948800,823392000,828748800,834278400,839635200,845078400,849312000,855360000,860198400,865641600,870652800,876182400,881020800,887068800,891907200,896745600,903225600,907632000,912470400,917913600,923356800,928281600,933984000,938476800,943920000,949363200,954806400,959644800,965174400,969926400],"y":[0.240643234328402,0.239866565002718,0.211103397811454,0.260162353840332,0.304296247670793,0.269262207504279,0.158852727378311,0.194866033857096,0.236929477428102,0.278617742780945,0.344656900580159,0.338663781964189,0.343149057634364,0.401927292639152,0.378457779333745,0.476518673518538,0.376610754347694,0.392942264401925,0.349698657067696,0.42331136112791,0.471299730954495,0.427908669452204,0.498963306529792,0.468227214282493,0.601436677281373,0.49164044871491,0.545712898647491,0.524188662920043,0.575373252340876,0.76791108278992,0.704379560335598,0.577035107328985,0.507615303671166,0.474351850103901,0.840092255145847,1.14889595102964,0.950474749192172,0.972511630492929,0.475151808458954,0.463213732343174,0.591410974995349,0.648980807337117,0.728667427053717,0.61270664975639,0.525029067129478,0.407787073625081,0.483586950750504,0.540148579053444,0.606263354707929,0.614667983173169,0.603191258313058,0.558189620049785,0.332048404115157,0.259511846965015],"text":["Date: 1991-12-02<br />mg_per_day: 0.24064323<br />Site: 759","Date: 1992-02-03<br />mg_per_day: 0.23986657<br />Site: 759","Date: 1992-03-29<br />mg_per_day: 0.21110340<br />Site: 759","Date: 1992-05-31<br />mg_per_day: 0.26016235<br />Site: 759","Date: 1992-08-02<br />mg_per_day: 0.30429625<br />Site: 759","Date: 1992-10-06<br />mg_per_day: 0.26926221<br />Site: 759","Date: 1992-12-06<br />mg_per_day: 0.15885273<br />Site: 759","Date: 1993-02-07<br />mg_per_day: 0.19486603<br />Site: 759","Date: 1993-04-11<br />mg_per_day: 0.23692948<br />Site: 759","Date: 1993-06-06<br />mg_per_day: 0.27861774<br />Site: 759","Date: 1993-08-08<br />mg_per_day: 0.34465690<br />Site: 759","Date: 1993-10-03<br />mg_per_day: 0.33866378<br />Site: 759","Date: 1993-12-05<br />mg_per_day: 0.34314906<br />Site: 759","Date: 1994-02-06<br />mg_per_day: 0.40192729<br />Site: 759","Date: 1994-04-02<br />mg_per_day: 0.37845778<br />Site: 759","Date: 1994-06-05<br />mg_per_day: 0.47651867<br />Site: 759","Date: 1994-08-05<br />mg_per_day: 0.37661075<br />Site: 759","Date: 1994-10-05<br />mg_per_day: 0.39294226<br />Site: 759","Date: 1994-12-05<br />mg_per_day: 0.34969866<br />Site: 759","Date: 1995-02-05<br />mg_per_day: 0.42331136<br />Site: 759","Date: 1995-04-17<br />mg_per_day: 0.47129973<br />Site: 759","Date: 1995-06-04<br />mg_per_day: 0.42790867<br />Site: 759","Date: 1995-08-06<br />mg_per_day: 0.49896331<br />Site: 759","Date: 1995-10-15<br />mg_per_day: 0.46822721<br />Site: 759","Date: 1995-12-03<br />mg_per_day: 0.60143668<br />Site: 759","Date: 1996-02-04<br />mg_per_day: 0.49164045<br />Site: 759","Date: 1996-04-06<br />mg_per_day: 0.54571290<br />Site: 759","Date: 1996-06-09<br />mg_per_day: 0.52418866<br />Site: 759","Date: 1996-08-10<br />mg_per_day: 0.57537325<br />Site: 759","Date: 1996-10-12<br />mg_per_day: 0.76791108<br />Site: 759","Date: 1996-11-30<br />mg_per_day: 0.70437956<br />Site: 759","Date: 1997-02-08<br />mg_per_day: 0.57703511<br />Site: 759","Date: 1997-04-05<br />mg_per_day: 0.50761530<br />Site: 759","Date: 1997-06-07<br />mg_per_day: 0.47435185<br />Site: 759","Date: 1997-08-04<br />mg_per_day: 0.84009226<br />Site: 759","Date: 1997-10-07<br />mg_per_day: 1.14889595<br />Site: 759","Date: 1997-12-02<br />mg_per_day: 0.95047475<br />Site: 759","Date: 1998-02-10<br />mg_per_day: 0.97251163<br />Site: 759","Date: 1998-04-07<br />mg_per_day: 0.47515181<br />Site: 759","Date: 1998-06-02<br />mg_per_day: 0.46321373<br />Site: 759","Date: 1998-08-16<br />mg_per_day: 0.59141097<br />Site: 759","Date: 1998-10-06<br />mg_per_day: 0.64898081<br />Site: 759","Date: 1998-12-01<br />mg_per_day: 0.72866743<br />Site: 759","Date: 1999-02-02<br />mg_per_day: 0.61270665<br />Site: 759","Date: 1999-04-06<br />mg_per_day: 0.52502907<br />Site: 759","Date: 1999-06-02<br />mg_per_day: 0.40778707<br />Site: 759","Date: 1999-08-07<br />mg_per_day: 0.48358695<br />Site: 759","Date: 1999-09-28<br />mg_per_day: 0.54014858<br />Site: 759","Date: 1999-11-30<br />mg_per_day: 0.60626335<br />Site: 759","Date: 2000-02-01<br />mg_per_day: 0.61466798<br />Site: 759","Date: 2000-04-04<br />mg_per_day: 0.60319126<br />Site: 759","Date: 2000-05-30<br />mg_per_day: 0.55818962<br />Site: 759","Date: 2000-08-02<br />mg_per_day: 0.33204840<br />Site: 759","Date: 2000-09-26<br />mg_per_day: 0.25951185<br />Site: 759"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"759","legendgroup":"759","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":43.1050228310502},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[677626560,983845440],"tickmode":"array","ticktext":["1992","1994","1996","1998","2000"],"tickvals":[694224000,757382400,820454400,883612800,946684800],"categoryorder":"array","categoryarray":["1992","1994","1996","1998","2000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.0422488241946963,1.20159343325988],"tickmode":"array","ticktext":["0.3","0.6","0.9","1.2"],"tickvals":[0.3,0.6,0.9,1.2],"categoryorder":"array","categoryarray":["0.3","0.6","0.9","1.2"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"mg_per_day","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"title":{"text":"Site","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}}},"hovermode":"x unified","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"4a1520859a34":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"4a1520859a34","visdat":{"4a1520859a34":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
