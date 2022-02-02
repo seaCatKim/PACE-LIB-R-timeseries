@@ -1,6 +1,6 @@
 ---
 title: "Part 2: Analysing Time Series Data"
-subtitle: "Pharmacy Australia Centre of Excellence x Library R workshop"
+subtitle: "Library x Queensland Alliance for Environmental Health R workshop"
 slug: "analysing"
 author: "Catherine Kim"
 date: "2022-01-27"
@@ -42,7 +42,7 @@ In this hands-on session...
 
 ```r
 library(tidyverse)
-library(lubridate) # work with dates
+library(lubridate) # work with date/time data
 library(readxl) # read excel files
 
 library(zoo)
@@ -52,21 +52,46 @@ library(tseries) # test for stationarity
 
 ## About the data
 
-...
+Sampling design: Atmospheric samples of the Compound X were collected each day during seven consecutive days for different month in the year. Some year and months had less samples due to technical problems.
 
 ## Read in the excel sheets
 
 For this section, we will go the process of analysing time series for one site. 
 
-Let's read in the first just the first site sheet from the excel file.
+Let's read in the cleaned data from Part 1, filter out the same site (1335), and split the Date column with lubridate. This can be done in one go with piping.
 
 
 ```r
-s1335 <- read_excel("Data workshop.xlsx", sheet = 3) %>% 
-   rename(Site = 1, Date = 3, mg_per_day = 7) %>% 
-   mutate(Site = factor(Site), # change columns to factor
-                   Year = as.factor(Year),
-                   Month = as.factor(Month)) 
+s1335 <- read_csv("data/analytes_data_clean.csv") %>% 
+   filter(Site == "1335") %>% 
+   mutate(Year = year(Date),
+          Month = month(Date),
+          Day = day(Date),
+          Site = factor(Site)) # change Site to a factor
+## Rows: 720 Columns: 4
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr  (1): Analyte
+## dbl  (2): Site, mg_per_day
+## date (1): Date
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+s1335
+## # A tibble: 352 x 7
+##    Site  Analyte Date       mg_per_day  Year Month   Day
+##    <fct> <chr>   <date>          <dbl> <dbl> <dbl> <int>
+##  1 1335  x       1991-11-28      0.253  1991    11    28
+##  2 1335  x       1991-11-29      0.239  1991    11    29
+##  3 1335  x       1991-11-30      0.197  1991    11    30
+##  4 1335  x       1991-12-01      0.173  1991    12     1
+##  5 1335  x       1991-12-02      0.222  1991    12     2
+##  6 1335  x       1991-12-03      0.191  1991    12     3
+##  7 1335  x       1992-01-30      0.298  1992     1    30
+##  8 1335  x       1992-01-31      0.253  1992     1    31
+##  9 1335  x       1992-02-01      0.256  1992     2     1
+## 10 1335  x       1992-02-02      0.284  1992     2     2
+## # ... with 342 more rows
 ```
 
 ### Visualize the data for one site
@@ -90,18 +115,18 @@ s1335 %>%
    arrange(-count) # arrange by count column in descending order
 ## `summarise()` has grouped output by 'Year'. You can override using the `.groups` argument.
 ## # A tibble: 68 x 3
-##    Year  Month count
-##    <fct> <fct> <int>
-##  1 1992  10        7
-##  2 1993  2         7
-##  3 1993  4         7
-##  4 1993  6         7
-##  5 1993  8         7
-##  6 1993  12        7
-##  7 1994  2         7
-##  8 1994  6         7
-##  9 1994  8         7
-## 10 1994  12        7
+##     Year Month count
+##    <dbl> <dbl> <int>
+##  1  1992    10     7
+##  2  1993     2     7
+##  3  1993     4     7
+##  4  1993     6     7
+##  5  1993     8     7
+##  6  1993    12     7
+##  7  1994     2     7
+##  8  1994     6     7
+##  9  1994     8     7
+## 10  1994    12     7
 ## # ... with 58 more rows
 ```
 
@@ -212,7 +237,6 @@ k32 <- rollmean(xts_1335, k = 32)
 
 kALL <- merge.xts(xts_1335, k2, k4, k8, k16, k32)
 head(kALL)
-## Warning: timezone of object (UTC) is different than current timezone ().
 ##             xts_1335        k2        k4        k8 k16 k32
 ## 1991-11-28 0.2530688 0.2460383        NA        NA  NA  NA
 ## 1991-11-29 0.2390078 0.2181042 0.2155385        NA  NA  NA
@@ -399,7 +423,7 @@ acf(s1335$mg_per_day)
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
 
-You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, there are 3 to 4 significant autocorrelation. The lags crossing the dotted blue line are statistically significant.
+You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, the number of significant lags is high. The lags crossing the dotted blue line are statistically significant.
 
 The **partial autocorrelation function** can also be plotted. The partial correlation is the left over correlation at lag *k* between all data points that are *k* steps apart accounting for the correlation with the data between *k* steps.
 
@@ -447,39 +471,49 @@ acf(ar_1335$res[-(1:ar_1335$order)], lag = 50)
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
 
-The correlogram of residuals has a few marinally significant lags (around 15 and between 30-40). The AR(4) model is a relatively good fit for the time series.
+The correlogram of residuals has a few marginally significant lags (around 15 and between 30-40). The AR(4) model is a relatively good fit for the time series.
 
 ## Regression
 
-*Deterministic* trends and seasonal variation can be modelled using regression.
+*Deterministic* trends and seasonal variation can be modeled using regression.
 
 Linear models are non-stationary for time series data, thus a non-stationary time series must be differenced.
 
 
 ```r
-chem <- window(ts_1335, start = 1991)
+diff <- window(ts_1335, start = 1991)
 ## Warning in window.default(x, ...): 'start' value not changed
-head(chem)
+head(diff)
 ##            Jan       Feb       Mar       Apr May Jun Jul Aug Sep Oct       Nov
 ## 1991                                                                 0.2530688
 ## 1992 0.1972005 0.1728767 0.2224569 0.1909951                                  
 ##            Dec
 ## 1991 0.2390078
 ## 1992
-chem.lm <- lm(chem ~ time(chem))
-coef(chem.lm)
-##  (Intercept)   time(chem) 
+lm_s1335 <- lm(diff ~ time(diff)) # extract the time component as the explanatory variable
+coef(lm_s1335)
+##  (Intercept)   time(diff) 
 ## -32.15810054   0.01623258
-confint(chem.lm)
+confint(lm_s1335)
 ##                    2.5 %       97.5 %
 ## (Intercept) -43.55848720 -20.75771387
-## time(chem)    0.01052169   0.02194348
-acf(resid(chem.lm))
+## time(diff)    0.01052169   0.02194348
+acf(resid(lm_s1335))
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
 
-## gls
+While the confidence interval does not include 0, which provides statistical evidence of increasing Compound X in the atmosphere, the ACF of the model residuals are signficantly positively autocorrelated. This means the model likely understimates the standard error and the confidence interval is too narrow.
+
+## Generalised Least Squares
+
+*Generalised Least Squares* model can account for some of this autocorrelation.
+
+From 5.4 of Cowpertwait & Metcalfe, 2009: 
+
+> *Generalised Least Squares* can be used to provide better estimates of the standard errors of the regression parameters to account for the autocorrelation in the residual series.
+
+A correlation structure is defined using the `cor` argument. The value is estimated from the acf at lag 1 in the previous correlogram. The residuals are approximated as an AR(1).
 
 
 ```r
@@ -492,43 +526,51 @@ library(nlme)
 ## The following object is masked from 'package:dplyr':
 ## 
 ##     collapse
-chem.gls <- gls(chem ~ time(chem), cor = corAR1(0.7))
-coef(chem.gls)
-##  (Intercept)   time(chem) 
-## -31.28011126   0.01579311
-confint(chem.gls)
-##                     2.5 %       97.5 %
-## (Intercept) -50.148423710 -12.41179881
-## time(chem)    0.006341238   0.02524498
-acf(resid(chem.gls))
+gls_s1335 <- gls(ts_1335 ~ time(ts_1335), cor = corAR1(0.4))
+coef(gls_s1335)
+##   (Intercept) time(ts_1335) 
+##  -31.28011034    0.01579311
+confint(gls_s1335)
+##                       2.5 %       97.5 %
+## (Intercept)   -50.148432309 -12.41178837
+## time(ts_1335)   0.006341232   0.02524498
+acf(resid(gls_s1335))
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
 
-## seasonal component
+The acf of the model residuals still have significant autocorrelation.
+
+## Adding a seasonal component
 
 
 ```r
-Seas <- cycle(chem)
-Time <- time(chem)
-chem.lm <- lm(chem ~ 0 + Time + factor(Seas))
-coef(chem.lm)
+Seas <- cycle(diff)
+Time <- time(diff)
+s1335_slm <- lm(ts_1335 ~ 0 + Time + factor(Seas))
+coef(s1335_slm)
 ##           Time  factor(Seas)1  factor(Seas)2  factor(Seas)3  factor(Seas)4 
 ##     0.01659631   -32.89287141   -32.89988569   -32.90702026   -32.89799718 
 ##  factor(Seas)5  factor(Seas)6  factor(Seas)7  factor(Seas)8  factor(Seas)9 
 ##   -32.87111561   -32.88731478   -32.88086313   -32.89100810   -32.89137196 
 ## factor(Seas)10 factor(Seas)11 factor(Seas)12 
 ##   -32.89752284   -32.80113584   -32.89359047
-acf(resid(chem.lm))
+acf(resid(s1335_slm))
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="672" />
 
-## ARIMA
+## Autoregressive Integated Moving Average (ARIMA)
+
+Autoregressive *integrate* moving average models define the model order (*p*, *d*, *q*). 
+
+[Cookbook R](https://rc2e.com/timeseriesanalysis#recipe-id085) explains it as:
+
+> *p* is the number of autoregressive coefficients, *d* is the degree of differencing, and *q* is tne number of moving average coefficients.
 
 
 ```r
-par(mfrow = c(2,1))
+par(mfrow = c(2,1)) # change window so 2 rows, 1 column of plots
 plot(ts_1335)
 plot(diff(ts_1335))
 ```
@@ -537,19 +579,106 @@ plot(diff(ts_1335))
 
 
 ```r
-AIC (arima(ts_1335, order = c(1,1,0),
-seas = list(order = c(1,0,0), 12)))
-## [1] -254.7406
-chem.arima <-  (arima(ts_1335, order = c(0,1,1),
-seas = list(order = c(0,0,1), 12)))
-
-acf(resid(chem.arima), lag = 50)
+arima_1 <-  arima(ts_1335, order = c(4,1,12))
+arima_1
+## 
+## Call:
+## arima(x = ts_1335, order = c(4, 1, 12))
+## 
+## Coefficients:
+##           ar1      ar2      ar3      ar4      ma1     ma2     ma3     ma4
+##       -0.2343  -0.3748  -0.2154  -0.3859  -0.3050  0.0544  0.1375  0.2879
+## s.e.   0.1679   0.1639   0.1456   0.1608   0.2137  0.1596  0.2386  0.3313
+##           ma5    ma6     ma7      ma8      ma9    ma10     ma11    ma12
+##       -0.3732  0.006  -0.047  -0.1887  -0.2032  0.1031  -0.2518  0.4761
+## s.e.   0.1768  0.141   0.169   0.1581   0.1197  0.1276   0.1537  0.1400
+## 
+## sigma^2 estimated as 0.003314:  log likelihood = 147.01,  aic = -260.02
+acf(resid(arima_1), lag = 50)
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-25-1.png" width="672" />
 
+Let's run a model with order(1, 1, 1) and compare AIC.
+
+
+```r
+arima_2 <-  arima(ts_1335, order = c(1, 1, 1))
+arima_2
+## 
+## Call:
+## arima(x = ts_1335, order = c(1, 1, 1))
+## 
+## Coefficients:
+##          ar1      ma1
+##       0.1558  -0.7970
+## s.e.  0.1317   0.0825
+## 
+## sigma^2 estimated as 0.004417:  log likelihood = 136.59,  aic = -267.18
+acf(resid(arima_2), lag = 50)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-26-1.png" width="672" />
+
+The second model had a lower AIC. Let's use the `forecast::auto.arima()` function from the forecast package to search for the best *p, d, q*.
+
+
+```r
+arima_3 <- auto.arima(ts_1335, seasonal = FALSE, max.p = 20, max.q = 20)
+arima_3
+## Series: ts_1335 
+## ARIMA(0,1,1) 
+## 
+## Coefficients:
+##           ma1
+##       -0.7212
+## s.e.   0.0771
+## 
+## sigma^2 = 0.004519:  log likelihood = 135.9
+## AIC=-267.8   AICc=-267.68   BIC=-262.47
+acf(resid(arima_3), lag = 50)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-27-1.png" width="672" />
+
+```r
+autoplot(ts_1335) # plot the time series
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-27-2.png" width="672" />
+
+## Seasonal ARIMA
+
+A seasonal component can also be added to ARIMA. The default for `auto.arima()` includes the seasonal component. 
+
+
+```r
+sarima <- auto.arima(ts_1335)
+sarima
+## Series: ts_1335 
+## ARIMA(0,1,1)(0,0,1)[12] 
+## 
+## Coefficients:
+##           ma1    sma1
+##       -0.6725  0.2765
+## s.e.   0.0849  0.1013
+## 
+## sigma^2 = 0.004255:  log likelihood = 139.19
+## AIC=-272.38   AICc=-272.14   BIC=-264.38
+acf(resid(sarima), lag = 50)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-28-1.png" width="672" />
+
+The addition of the seasonal component improves the AIC and the correlogram is close to the 'white noise' standard.
+
 ## Resources 
 
 Resources used to compile this session included:
+
+* [Introductory Time Series with R](https://link-springer-com.ezproxy.library.uq.edu.au/chapter/10.1007%2F978-0-387-88698-5_5) by Paul Cowpertwait and Andrew Metcalfe, Springer 2009.
 * [Ch 14 Time Series Analysis](https://rc2e.com/timeseriesanalysis) in R Cookbook, 2nd edition, by JD Long and Paul Teetor. Copyright 2019 JD Long and Paul Teetor, 978-1-492-04068-2
 * [Time Series Analysis with R](https://nicolarighetti.github.io/Time-Series-Analysis-With-R/) by Nicola Righetti
+* [Applied Time Series Analysis For Fisheries and Environmental Sciences](https://atsa-es.github.io/atsa-labs/sec-boxjenkins-aug-dickey-fuller.html) by Elizabeth Holmes, Mark Scheuerell, and Eric Ward.
+* [Time Series Analysis](http://r-statistics.co/Time-Series-Analysis-With-R.html) article by Selva Prabhakaran
+* [Working with Financial Time Series Data in R](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf) document by Eric Zivot.

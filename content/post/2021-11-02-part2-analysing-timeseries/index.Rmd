@@ -1,6 +1,6 @@
 ---
 title: "Part 2: Analysing Time Series Data"
-subtitle: "Pharmacy Australia Centre of Excellence x Library R workshop"
+subtitle: "Library x Queensland Alliance for Environmental Health R workshop"
 slug: "analysing"
 author: "Catherine Kim"
 date: "2022-01-27"
@@ -43,7 +43,7 @@ In this hands-on session...
 
 ```{r packages, warning=FALSE, message = FALSE}
 library(tidyverse)
-library(lubridate) # work with dates
+library(lubridate) # work with date/time data
 library(readxl) # read excel files
 
 library(zoo)
@@ -53,20 +53,22 @@ library(tseries) # test for stationarity
 
 ## About the data
 
-...
+Sampling design: Atmospheric samples of the Compound X were collected each day during seven consecutive days for different month in the year. Some year and months had less samples due to technical problems.
 
 ## Read in the excel sheets
 
 For this section, we will go the process of analysing time series for one site. 
 
-Let's read in the first just the first site sheet from the excel file.
+Let's read in the cleaned data from Part 1, filter out the same site (1335), and split the Date column with lubridate. This can be done in one go with piping.
 
 ```{r}
-s1335 <- read_excel("Data workshop.xlsx", sheet = 3) %>% 
-   rename(Site = 1, Date = 3, mg_per_day = 7) %>% 
-   mutate(Site = factor(Site), # change columns to factor
-                   Year = as.factor(Year),
-                   Month = as.factor(Month)) 
+s1335 <- read_csv("data/analytes_data_clean.csv") %>% 
+   filter(Site == "1335") %>% 
+   mutate(Year = year(Date),
+          Month = month(Date),
+          Day = day(Date),
+          Site = factor(Site)) # change Site to a factor
+s1335
 ```
 
 ### Visualize the data for one site
@@ -276,7 +278,7 @@ The cutest explanation of ACF by Dr Allison Horst:
 acf(s1335$mg_per_day)
 ```
 
-You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, there are 3 to 4 significant autocorrelation. The lags crossing the dotted blue line are statistically significant.
+You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, the number of significant lags is high. The lags crossing the dotted blue line are statistically significant.
 
 The **partial autocorrelation function** can also be plotted. The partial correlation is the left over correlation at lag *k* between all data points that are *k* steps apart accounting for the correlation with the data between *k* steps.
 
@@ -310,65 +312,115 @@ ar_1335$ar
 acf(ar_1335$res[-(1:ar_1335$order)], lag = 50) 
 ```
 
-The correlogram of residuals has a few marinally significant lags (around 15 and between 30-40). The AR(4) model is a relatively good fit for the time series.
+The correlogram of residuals has a few marginally significant lags (around 15 and between 30-40). The AR(4) model is a relatively good fit for the time series.
 
 ## Regression
 
-*Deterministic* trends and seasonal variation can be modelled using regression.
+*Deterministic* trends and seasonal variation can be modeled using regression.
 
 Linear models are non-stationary for time series data, thus a non-stationary time series must be differenced.
 
 ```{r}
-chem <- window(ts_1335, start = 1991)
-head(chem)
+diff <- window(ts_1335, start = 1991)
+head(diff)
 
-chem.lm <- lm(chem ~ time(chem))
-coef(chem.lm)
+lm_s1335 <- lm(diff ~ time(diff)) # extract the time component as the explanatory variable
+coef(lm_s1335)
 
-confint(chem.lm)
-acf(resid(chem.lm))
+confint(lm_s1335)
+acf(resid(lm_s1335))
 ```
 
-## gls
+While the confidence interval does not include 0, which provides statistical evidence of increasing Compound X in the atmosphere, the ACF of the model residuals are signficantly positively autocorrelated. This means the model likely understimates the standard error and the confidence interval is too narrow.
+
+## Generalised Least Squares
+
+*Generalised Least Squares* model can account for some of this autocorrelation.
+
+From 5.4 of Cowpertwait & Metcalfe, 2009: 
+
+> *Generalised Least Squares* can be used to provide better estimates of the standard errors of the regression parameters to account for the autocorrelation in the residual series.
+
+A correlation structure is defined using the `cor` argument. The value is estimated from the acf at lag 1 in the previous correlogram. The residuals are approximated as an AR(1).
 
 ```{r}
 library(nlme)
-chem.gls <- gls(chem ~ time(chem), cor = corAR1(0.7))
-coef(chem.gls)
-confint(chem.gls)
-acf(resid(chem.gls))
+gls_s1335 <- gls(ts_1335 ~ time(ts_1335), cor = corAR1(0.4))
+coef(gls_s1335)
+confint(gls_s1335)
+acf(resid(gls_s1335))
 ```
 
-## seasonal component
+The acf of the model residuals still have significant autocorrelation.
+
+## Adding a seasonal component
 
 ```{r}
-Seas <- cycle(chem)
-Time <- time(chem)
-chem.lm <- lm(chem ~ 0 + Time + factor(Seas))
-coef(chem.lm)
-acf(resid(chem.lm))
+Seas <- cycle(diff)
+Time <- time(diff)
+s1335_slm <- lm(ts_1335 ~ 0 + Time + factor(Seas))
+coef(s1335_slm)
+acf(resid(s1335_slm))
 ```
 
-## ARIMA
+## Autoregressive Integated Moving Average (ARIMA)
+
+Autoregressive *integrate* moving average models define the model order (*p*, *d*, *q*). 
+
+[Cookbook R](https://rc2e.com/timeseriesanalysis#recipe-id085) explains it as:
+
+> *p* is the number of autoregressive coefficients, *d* is the degree of differencing, and *q* is tne number of moving average coefficients.
 
 ```{r}
-par(mfrow = c(2,1))
+par(mfrow = c(2,1)) # change window so 2 rows, 1 column of plots
 plot(ts_1335)
 plot(diff(ts_1335))
 ```
 
 ```{r}
-AIC (arima(ts_1335, order = c(1,1,0),
-seas = list(order = c(1,0,0), 12)))
-
-chem.arima <-  (arima(ts_1335, order = c(0,1,1),
-seas = list(order = c(0,0,1), 12)))
-
-acf(resid(chem.arima), lag = 50)
+arima_1 <-  arima(ts_1335, order = c(4,1,12))
+arima_1
+acf(resid(arima_1), lag = 50)
 ```
+
+Let's run a model with order(1, 1, 1) and compare AIC.
+
+```{r}
+arima_2 <-  arima(ts_1335, order = c(1, 1, 1))
+arima_2
+acf(resid(arima_2), lag = 50)
+```
+
+The second model had a lower AIC. Let's use the `forecast::auto.arima()` function from the forecast package to search for the best *p, d, q*.
+
+```{r}
+arima_3 <- auto.arima(ts_1335, seasonal = FALSE, max.p = 20, max.q = 20)
+arima_3
+acf(resid(arima_3), lag = 50)
+
+autoplot(ts_1335) # plot the time series
+```
+
+## Seasonal ARIMA
+
+A seasonal component can also be added to ARIMA. The default for `auto.arima()` includes the seasonal component. 
+
+```{r}
+sarima <- auto.arima(ts_1335)
+sarima
+
+acf(resid(sarima), lag = 50)
+```
+
+The addition of the seasonal component improves the AIC and the correlogram is close to the 'white noise' standard.
 
 ## Resources 
 
 Resources used to compile this session included:
+
+* [Introductory Time Series with R](https://link-springer-com.ezproxy.library.uq.edu.au/chapter/10.1007%2F978-0-387-88698-5_5) by Paul Cowpertwait and Andrew Metcalfe, Springer 2009.
 * [Ch 14 Time Series Analysis](https://rc2e.com/timeseriesanalysis) in R Cookbook, 2nd edition, by JD Long and Paul Teetor. Copyright 2019 JD Long and Paul Teetor, 978-1-492-04068-2
 * [Time Series Analysis with R](https://nicolarighetti.github.io/Time-Series-Analysis-With-R/) by Nicola Righetti
+* [Applied Time Series Analysis For Fisheries and Environmental Sciences](https://atsa-es.github.io/atsa-labs/sec-boxjenkins-aug-dickey-fuller.html) by Elizabeth Holmes, Mark Scheuerell, and Eric Ward.
+* [Time Series Analysis](http://r-statistics.co/Time-Series-Analysis-With-R.html) article by Selva Prabhakaran
+* [Working with Financial Time Series Data in R](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf) document by Eric Zivot.
