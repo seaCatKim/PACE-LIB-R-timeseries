@@ -330,6 +330,30 @@ ggplotly(p) %>%
    layout(hovermode = "x unified")
 ```
 
+## Rolling operations
+
+With time series affected by seasonality, or with a lot of variation creating visual noise, it is sometimes useful to represent long-term trends with a rolling average.
+
+The package [RcppRoll](https://cran.r-project.org/package=RcppRoll) is useful for this kind of windowed operation:
+
+```{r rolling average}
+library(RcppRoll)
+analytes_summary %>% 
+   group_by(Site) %>% 
+   mutate(rolling_mean = roll_mean(mg_per_day,
+                                   n = 6,          # the size of the window
+                                   fill = NA)) %>% # to have same length
+   ggplot(aes(x = Date,
+           y = rolling_mean,
+           colour = Site)) +
+  geom_line()
+```
+
+This method might not be the best for this data, but it proves very useful in other cases, for example for COVID-19 daily infection rates (with a 7-day window).
+
+## Next: part 2
+
+In [Part 2](2022/01/27/timeseries-data/), you will learn about analysing time series data.
 
 ````{comment}
 
