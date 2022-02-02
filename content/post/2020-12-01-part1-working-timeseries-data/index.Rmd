@@ -3,7 +3,7 @@ title: "Part 1: Working with time series data"
 slug: "timeseries data"
 subtitle: "Pharmacy Australia Centre of Excellence x Library R workshop"
 author: "Stéphane Guillou"
-date: "2022-01-27"
+date: "2022-02-03"
 categories: ["R"]
 tags: [""]
 output:

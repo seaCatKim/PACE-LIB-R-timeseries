@@ -3,7 +3,7 @@ title: "Part 2: Analysing Time Series Data"
 subtitle: "Library x Queensland Alliance for Environmental Health R workshop"
 slug: "analysing"
 author: "Catherine Kim"
-date: "2022-01-27"
+date: "2022-02-03"
 categories: ["R"]
 tags: [""]
 output:
@@ -35,7 +35,12 @@ We are happy to have any and all questions though!
 
 ## What are we going to learn?
 
-In this hands-on session...
+In the second part of this workshop, we will learn how to:
+
+* convert to time series objects
+* investigate aspects of a times series such as trends, seasonality, and stationarity
+* assess autocorrelation
+* apply different models
 
 ## Load packages
 
@@ -54,7 +59,7 @@ library(tseries) # test for stationarity
 
 Sampling design: Atmospheric samples of the Compound X were collected each day during seven consecutive days for different month in the year. Some year and months had less samples due to technical problems.
 
-## Read in the excel sheets
+## Read in the data
 
 For this section, we will go the process of analysing time series for one site. 
 
@@ -673,6 +678,8 @@ acf(resid(sarima), lag = 50)
 The addition of the seasonal component improves the AIC and the correlogram is close to the 'white noise' standard.
 
 ## Resources 
+
+Check out [tidyverts](https://tidyverts.org/), tidy tools for time series!
 
 Resources used to compile this session included:
 
