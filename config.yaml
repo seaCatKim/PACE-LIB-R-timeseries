@@ -1,4 +1,4 @@
-baseurl: https://qaehs-lib-rtimeseries2022.netlify.app/
+baseurl: https://pace-lib-rtimeseries2022.netlify.app/
 languageCode: en-us
 title: UQ Library x PACE Time Series R Workshop
 theme: hugo-lithium
@@ -20,8 +20,8 @@ menu:
       url: https://github.com/seaCatKim/PACE-LIB-R-timeseries
     - name: UQ Library Twitter
       url: https://twitter.com/UQ_Library
-    - name: PACE
-      url: https://pharmacy.uq.edu.au/about/pharmacy-australia-centre-excellence
+    - name: QAEHS
+      url: https://qaehs.centre.uq.edu.au/
 params:
   orgName: "The University of Queensland"
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
