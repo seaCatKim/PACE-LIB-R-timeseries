@@ -47,6 +47,7 @@ library(readxl) # read excel files
 
 library(zoo)
 library(forecast)
+library(tseries) # test for stationarity
 ```
 
 ## About the data
@@ -268,6 +269,22 @@ plot(sa_1335)
 
 These two plots are pretty much the same. There does not seem to be a large seasonality component in the data.
 
+It can also be visualised using on the same plot to highlight the small effect of seasonality.
+
+
+```r
+s1335_deseason <- ts_1335 - decomp_1335$seasonal # manually adjust for seasonality
+
+deseason <- ts.intersect(ts_1335, s1335_deseason) # bind the two time series
+
+plot.ts(deseason, 
+        plot.type = "single",
+        col = c("red", "blue"),
+        main = "Original (red) and Seasonally Adjusted Series (blue)")
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+
 Plot the time series against the seasons in separate years.
 
 
@@ -276,17 +293,24 @@ par(mfrow = c(1,1))
 seasonplot(sa_1335, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: Site 1335")
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" />
 
 The lines do not really follow the same pattern throughout the year - again, not a big seasonality component.
 
 ## Stationarity
 
-Test for stationarity.
+The **residual** part of the model should be **random** where the model explained most significant patterns or *signal* in the time series leaving out the *noise*.
+
+[This article](http://r-statistics.co/Time-Series-Analysis-With-R.html) states that the following conditions must be met:
+
+1. The mean value of time-series is constant over time, which implies, the trend component is nullified.
+2. The variance does not increase over time.
+3. Seasonality effect is minimal.
+
+There are a few tests for stationarity with the `tseries` package: Augmented Dickery-Fuller and KPSS. See this [section](https://atsa-es.github.io/atsa-labs/sec-boxjenkins-aug-dickey-fuller.html). 
 
 
 ```r
-library(tseries)
 adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
 ## 
 ## 	Augmented Dickey-Fuller Test
@@ -294,22 +318,69 @@ adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
 ## data:  ts_1335
 ## Dickey-Fuller = -2.7241, Lag order = 4, p-value = 0.2763
 ## alternative hypothesis: stationary
-kpss.test(ts_1335)
-## Warning in kpss.test(ts_1335): p-value smaller than printed p-value
+kpss.test(ts_1335, null = "Trend") # null hypothesis is that the ts is level/trend stationary, so do not want to reject the null, p > 0.05
+## Warning in kpss.test(ts_1335, null = "Trend"): p-value smaller than printed p-
+## value
 ## 
-## 	KPSS Test for Level Stationarity
+## 	KPSS Test for Trend Stationarity
 ## 
 ## data:  ts_1335
-## KPSS Level = 1.0517, Truncation lag parameter = 4, p-value = 0.01
+## KPSS Trend = 0.28448, Truncation lag parameter = 4, p-value = 0.01
+# 
 ```
+
+The tests indicate that the time series is not stationary. How do you make a non-stationary time series stationary?
 
 ## Differencing
 
+One common way is to *difference* a time series - subtract each point in the series from the previous point.
+
+Using the `forecast` package, we can do *seasonal differencing* and *regular differencing*.
+
 
 ```r
-nsdiffs(ts_1335)
+nsdiffs(ts_1335, type = "trend") # seasonal differencing
+## Warning: The chosen seasonal unit root test encountered an error when testing for the first difference.
+## From seas.heuristic(): unused argument (type = "trend")
+## 0 seasonal differences will be used. Consider using a different unit root test.
 ## [1] 0
+ndiffs(ts_1335, type = "trend") # type 'level' deterministic component is default
+## [1] 1
+stationaryTS <- diff(ts_1335, differences= 1)
+
+diffed <- ts.intersect(ts_1335, stationaryTS) # bind the two time series
+
+plot.ts(diffed, 
+        plot.type = "single",
+        col = c("red", "blue"),
+        main = "Original (red) and Differenced Series (blue)")
 ```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+
+Let's check the differenced time series with the same stationarity tests: 
+
+
+```r
+adf.test(stationaryTS) 
+## Warning in adf.test(stationaryTS): p-value smaller than printed p-value
+## 
+## 	Augmented Dickey-Fuller Test
+## 
+## data:  stationaryTS
+## Dickey-Fuller = -7.3514, Lag order = 4, p-value = 0.01
+## alternative hypothesis: stationary
+kpss.test(stationaryTS, null = "Trend")
+## Warning in kpss.test(stationaryTS, null = "Trend"): p-value greater than printed
+## p-value
+## 
+## 	KPSS Test for Trend Stationarity
+## 
+## data:  stationaryTS
+## KPSS Trend = 0.029403, Truncation lag parameter = 4, p-value = 0.1
+```
+
+The both tests now indicate the differenced time series is now stationary.
 
 ## Autocorrelation
 
@@ -326,10 +397,9 @@ The cutest explanation of ACF by Dr Allison Horst:
 acf(s1335$mg_per_day)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
 
 You can used the ACF to estimate the number of moving average (MA) coefficients in the model. Here, there are 3 to 4 significant autocorrelation. The lags crossing the dotted blue line are statistically significant.
-
 
 The **partial autocorrelation function** can also be plotted. The partial correlation is the left over correlation at lag *k* between all data points that are *k* steps apart accounting for the correlation with the data between *k* steps.
 
@@ -338,7 +408,7 @@ The **partial autocorrelation function** can also be plotted. The partial correl
 pacf(s1335$mg_per_day)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="672" />
 
 Practically, this can help us identify the number of autoregression (AR) coefficients in an autoregression integrated moving average (ARIMA) model. The above plot shows *k* = 3 so the initial ARIMA model will have three AR coefficients (AR(3)). The model will still require fitting and checking.
 
@@ -358,9 +428,9 @@ Box.test(ts_1335)
 
 The p-value is significant which means the data contains significant autocorrelations.
 
+## Autoregressive model
 
-
-## AR model
+Autoregressive (AR) models can simulate *stochastic* trends by regressing the time series on its past values. Order selection is done by Arkaike Information Criterion (AIC) and method chosen here is maximum likelihood estimation (mle).
 
 
 ```r
@@ -375,9 +445,15 @@ ar_1335$ar
 acf(ar_1335$res[-(1:ar_1335$order)], lag = 50) 
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
 
-## regression
+The correlogram of residuals has a few marinally significant lags (around 15 and between 30-40). The AR(4) model is a relatively good fit for the time series.
+
+## Regression
+
+*Deterministic* trends and seasonal variation can be modelled using regression.
+
+Linear models are non-stationary for time series data, thus a non-stationary time series must be differenced.
 
 
 ```r
@@ -401,7 +477,7 @@ confint(chem.lm)
 acf(resid(chem.lm))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
 
 ## gls
 
@@ -427,7 +503,7 @@ confint(chem.gls)
 acf(resid(chem.gls))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
 
 ## seasonal component
 
@@ -446,7 +522,7 @@ coef(chem.lm)
 acf(resid(chem.lm))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="672" />
 
 ## ARIMA
 
@@ -457,7 +533,7 @@ plot(ts_1335)
 plot(diff(ts_1335))
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-24-1.png" width="672" />
 
 
 ```r
@@ -470,7 +546,7 @@ seas = list(order = c(0,0,1), 12)))
 acf(resid(chem.arima), lag = 50)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-25-1.png" width="672" />
 
 ## Resources 
 
