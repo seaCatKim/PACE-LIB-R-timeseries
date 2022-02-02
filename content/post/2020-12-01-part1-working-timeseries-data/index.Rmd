@@ -103,9 +103,9 @@ head(analytes)
 
 Even though this workbook only has two sheets of data, we might want to automate the reading and binding of all data sheets to avoid repeating code. This comes in very handy if you have a workbook with a dozen sheets of data, or if your data is split between several files.
 
-The purrr is a package that allows "mapping" functions (or set of operations) to several elements. Here, we will _map_ the reading of the sheet to each _element_ in a vector of sheet names.
+The purrr package allows "mapping" a function (or a more complex command) to several elements. Here, we will _map_ the reading of the sheet to each _element_ in a vector of sheet names.
 
-Using the `map_dfr()` function makes sure we have a single dataframe as an output.
+Using the `map_dfr()` function makes sure we have a single data frame as an output.
 
 ```{r}
 # only keep sheet names that contain actual data
@@ -116,7 +116,7 @@ analytes <- map_dfr(sheets,
                     ~ read_excel("data/analytes_data.xlsx", sheet = .x))
 ```
 
-We could map a function by simply providing the name of the function. However, because we are doing something slightly more elaborate here (pointing to one single file, and using an extra argument to point to the sheet itself), we need to use the `~` syntax.
+We could map a function by simply providing the name of the function. However, because we are doing something slightly more elaborate here (pointing to one single file, and using an extra argument to point to the sheet itself), we need to use the `~` syntax, and point to the element being processed with the `.x` placeholder.
 
 > For more information on the different options the `map` family offers, see `?map`.
 
@@ -218,8 +218,9 @@ How many sampling days per month are there?
 
 ```{r samples per month}
 analytes %>% 
-   group_by(year, month) %>% 
-   count()
+   group_by(Site, year, month) %>% 
+   count() %>% 
+   head(12)
 ```
 
 The number of samples per month is irregular, and some months have no data.
@@ -227,7 +228,7 @@ The number of samples per month is irregular, and some months have no data.
 Furthermore, the week numbers don't align with the sampling weeks, and some sampling weeks overlap over two months:
 
 ```{r see month overlaps}
-analytes %>%  select(year, month, day, week) %>%  head(15)
+analytes %>%  select(year, month, day, week) %>%  head(10)
 ```
 
 In any case, the fact that week numbers are reset at the beginning of the year wouldn't help.
@@ -274,7 +275,7 @@ analytes_summary <- analytes %>%
    ungroup()
 ```
 
-Let's try again our line plot with the summarise data:
+Let's try again our line plot with the summarised data:
 
 ```{r line plot summarised}
 ggplot(analytes_summary,

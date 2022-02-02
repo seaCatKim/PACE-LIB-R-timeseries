@@ -124,9 +124,9 @@ head(analytes)
 
 Even though this workbook only has two sheets of data, we might want to automate the reading and binding of all data sheets to avoid repeating code. This comes in very handy if you have a workbook with a dozen sheets of data, or if your data is split between several files.
 
-The purrr is a package that allows "mapping" functions (or set of operations) to several elements. Here, we will _map_ the reading of the sheet to each _element_ in a vector of sheet names.
+The purrr package allows "mapping" a function (or a more complex command) to several elements. Here, we will _map_ the reading of the sheet to each _element_ in a vector of sheet names.
 
-Using the `map_dfr()` function makes sure we have a single dataframe as an output.
+Using the `map_dfr()` function makes sure we have a single data frame as an output.
 
 
 ```r
@@ -138,7 +138,7 @@ analytes <- map_dfr(sheets,
                     ~ read_excel("data/analytes_data.xlsx", sheet = .x))
 ```
 
-We could map a function by simply providing the name of the function. However, because we are doing something slightly more elaborate here (pointing to one single file, and using an extra argument to point to the sheet itself), we need to use the `~` syntax.
+We could map a function by simply providing the name of the function. However, because we are doing something slightly more elaborate here (pointing to one single file, and using an extra argument to point to the sheet itself), we need to use the `~` syntax, and point to the element being processed with the `.x` placeholder.
 
 > For more information on the different options the `map` family offers, see `?map`.
 
@@ -262,22 +262,24 @@ How many sampling days per month are there?
 
 ```r
 analytes %>% 
-   group_by(year, month) %>% 
-   count()
-## # A tibble: 74 × 3
-##     year month     n
-##    <dbl> <dbl> <int>
-##  1  1991    11     5
-##  2  1991    12     8
-##  3  1992     1     3
-##  4  1992     2    11
-##  5  1992     3    11
-##  6  1992     4     3
-##  7  1992     5     8
-##  8  1992     6     6
-##  9  1992     7     4
-## 10  1992     8     9
-## # … with 64 more rows
+   group_by(Site, year, month) %>% 
+   count() %>% 
+   head(12)
+## # A tibble: 12 × 4
+##    Site   year month     n
+##    <chr> <dbl> <dbl> <int>
+##  1 1335   1991    11     3
+##  2 1335   1991    12     3
+##  3 1335   1992     1     2
+##  4 1335   1992     2     5
+##  5 1335   1992     3     5
+##  6 1335   1992     4     2
+##  7 1335   1992     5     4
+##  8 1335   1992     6     3
+##  9 1335   1992     7     2
+## 10 1335   1992     8     4
+## 11 1335   1992    10     7
+## 12 1335   1992    12     6
 ```
 
 The number of samples per month is irregular, and some months have no data.
@@ -286,8 +288,8 @@ Furthermore, the week numbers don't align with the sampling weeks, and some samp
 
 
 ```r
-analytes %>%  select(year, month, day, week) %>%  head(15)
-## # A tibble: 15 × 4
+analytes %>%  select(year, month, day, week) %>%  head(10)
+## # A tibble: 10 × 4
 ##     year month   day  week
 ##    <dbl> <dbl> <int> <dbl>
 ##  1  1991    11    29    48
@@ -300,11 +302,6 @@ analytes %>%  select(year, month, day, week) %>%  head(15)
 ##  8  1992     1    31     5
 ##  9  1992     2     1     5
 ## 10  1992     2     2     5
-## 11  1992     2     3     5
-## 12  1992     2     4     5
-## 13  1992     2     5     6
-## 14  1992     2     6     6
-## 15  1992     3    26    13
 ```
 
 In any case, the fact that week numbers are reset at the beginning of the year wouldn't help.
@@ -366,7 +363,7 @@ analytes_summary <- analytes %>%
 ## the `.groups` argument.
 ```
 
-Let's try again our line plot with the summarise data:
+Let's try again our line plot with the summarised data:
 
 
 ```r
