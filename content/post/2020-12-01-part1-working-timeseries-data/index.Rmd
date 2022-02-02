@@ -289,33 +289,6 @@ This is a lot cleaner than what we had originally!
 
 ## Export summarised data
 
-...
-
----
-
-```{r}
-# chem <- read_csv("tailored_data_R.csv") 
-# head(chem)
-```
-
-Change columns to appropriate data type:
-
-```{r}
-# chem$`Site code` <- as.factor(chem$`Site code`)
-# chem$Analyte <- as.factor(chem$Analyte)
-# chem$Date <- as.Date(chem$Date, format =  "%d/%m/%Y")
-# 
-# head(chem)
-```
-
-## Visualize the data
-
-```{r}
-# ggplot(data = chem,
-#        aes(x = Date,
-#            y = `mg/day`)) +
-#    geom_point()
-```
 
 
 
