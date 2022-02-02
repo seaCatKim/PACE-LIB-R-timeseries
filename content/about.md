@@ -3,7 +3,7 @@ date: "2016-05-05T21:48:51-07:00"
 title: About
 ---
 
-This website and associated repository were created to publish the supporting material for a half-day R workshop developed by the [The University of Queensland Library](https://www.library.uq.edu.au/) on time series data for the [Pharmacy Australia Centre of Excellence](https://pharmacy.uq.edu.au/about/pharmacy-australia-centre-excellence) (PACE).
+This website and associated repository were created to publish the supporting material for a half-day R workshop developed by the [The University of Queensland Library](https://www.library.uq.edu.au/) on time series data for the [Queensland Alliance for Environmental Health Sciences](https://qaehs.centre.uq.edu.au/) (QAEHS).
 
 # Workshop Trainers
 ![headshot of Stéphane Guillou](/./about_files/stragu_pic.png)<br>
@@ -14,7 +14,7 @@ Technology Trainer, UQ Library <br>
 Catherine Kim <br>
 Technology Trainer, UQ Library <br>
 
-# Contact
+# Contac
 Are you a member of the UQ community that is interested in a training workshop through the Library? 
 
 Contact the training team at: library dot uq dot edu dot au
