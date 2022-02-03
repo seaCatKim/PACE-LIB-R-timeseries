@@ -3,7 +3,7 @@ title: "Part 2: Analysing Time Series Data"
 subtitle: "Library x Queensland Alliance for Environmental Health R workshop"
 slug: "analysing"
 author: "Catherine Kim"
-date: "2022-01-27"
+date: "2022-02-03"
 categories: ["R"]
 tags: [""]
 output:
