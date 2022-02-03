@@ -11,6 +11,7 @@ output:
     df_print: tibble
     toc: true
     number_sections: TRUE
+    math: true
 ---
 
 
@@ -140,10 +141,10 @@ The maximum number of samples we have per month is 7. Probably not enough to do 
 
 ```r
 ave_s1335 <- s1335 %>% 
-   group_by(Year, Month, Site, Date) %>% 
+   group_by(Year, Month, Site) %>% 
    summarize(mg_per_day = mean(mg_per_day),
              SD = sd(mg_per_day))
-## `summarise()` has grouped output by 'Year', 'Month', 'Site'. You can override using the `.groups` argument.
+## `summarise()` has grouped output by 'Year', 'Month'. You can override using the `.groups` argument.
 ```
 
 Alternatively, can graphically summarize the distribution of dates using the `hist()` (`hist.Date()`) function. 
@@ -162,7 +163,7 @@ hist(as.Date(s1335$Date), # change POSIXct to Date object
 
 Let's convert our data into a time series. Times series data must be sampled at equispaced points in time.
 
-There are several different time series object that have different functionalalities such as working with irregularly spaced time series. See this [resource](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf).
+There are several different time series object that have different functionalities such as working with irregularly spaced time series. See this [resource](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf).
 
 
 ```r
@@ -174,26 +175,26 @@ class(ts_1335) # check the object class
 ts_1335 # see the data
 ##             Jan        Feb        Mar        Apr        May        Jun
 ## 1991                                                                  
-## 1992 0.19720048 0.17287674 0.22245691 0.19099507 0.29837595 0.25253055
-## 1993 0.16021289 0.17687754 0.17556807 0.18637328 0.23178339 0.25296320
-## 1994 0.26344432 0.22925615 0.20842929 0.37041379 0.24118309 0.27879146
-## 1995 0.21130029 0.19121012 0.10307317 0.08241862 0.09931825 0.08333792
-## 1996 0.14728220 0.16492892 0.19284190 0.17767449 0.17986075 0.20276905
-## 1997 0.21863033 0.24410228 0.23386617 0.25159712 0.30447740 0.29352118
-## 1998 0.30978222 0.25296185 0.21872907 0.23005210 0.24302850 0.27009450
-## 1999 0.29154410 0.36545669 0.38763046 0.32599558 0.34510937 0.29771991
-## 2000 0.30085380 0.25189903 0.25521031 0.27594033 0.40270498 0.28076867
+## 1992 0.27545325 0.25955623 0.17283015 0.24237330 0.21492034 0.21685501
+## 1993 0.24936087 0.26921357 0.30978222 0.25693728 0.37014955 0.33177930
+## 1994 0.34481141 0.34235679 0.36426187 0.46659618 0.44669432 0.37206745
+## 1995 0.65457749 0.69834479 0.62221301 0.57168051 0.40724687 0.41195379
+## 1996 0.24812201 0.25220778 0.32420921 0.40677658 0.49618890 0.34124538
+## 1997 0.49926914 0.48207736 0.26538307 0.24687993 0.24478730 0.18937818
+## 1998 0.21492034 0.21685501 0.21884272 0.29415920 0.18834451 0.09494631
+## 1999 0.37014955 0.33177930 0.27831867 0.33660285 0.32467068 0.26865238
+## 2000 0.44669432 0.37206745 0.39990788 0.47986144 0.33436319 0.38241556
 ##             Jul        Aug        Sep        Oct        Nov        Dec
-## 1991                                             0.25306877 0.23900784
-## 1992 0.25565163 0.28373564 0.23251146 0.21234847 0.31353391 0.16511895
-## 1993 0.28689861 0.19435768 0.18664468 0.19178039 0.20202774 0.18509298
-## 1994 0.28624845 0.21469297 0.18553862 0.17246271 0.17704678 0.16616008
-## 1995 0.08211737 0.11941252 0.18315669 0.17061648 0.14140745 0.14434108
-## 1996 0.20712967 0.22212884 0.24918299 0.21774453 0.25409175 0.23876105
-## 1997 0.26507705 0.25044615 0.24562185 0.24100262 0.27477369 0.31405246
-## 1998 0.32675768 0.32439414 0.25294530 0.37859670 0.68902957 0.28908035
-## 1999 0.29811903 0.30952621 0.35835451 0.27831867 0.59599662 0.33971704
-## 2000 0.27500903 0.28545684 0.31936740
+## 1991                                             0.22975903 0.19544291
+## 1992 0.21884272 0.29415920 0.18834451 0.09494631 0.16351067 0.20807004
+## 1993 0.27831867 0.33660285 0.32467068 0.26865238 0.31360895 0.26773691
+## 1994 0.39990788 0.47986144 0.33436319 0.38241556 0.38570498 0.46601276
+## 1995 0.50863024 0.60921090 0.66656370 0.67302314 0.84627446 0.26116715
+## 1996 0.36344698 0.32072347 0.29003143 0.26723167 0.35837799 0.42259062
+## 1997 0.22975903 0.19544291 0.27545325 0.25955623 0.17283015 0.24237330
+## 1998 0.16351067 0.20807004 0.24936087 0.26921357 0.30978222 0.25693728
+## 1999 0.31360895 0.26773691 0.34481141 0.34235679 0.36426187 0.46659618
+## 2000 0.38570498 0.46601276 0.65457749
 ```
 
 ## Create a irregularly spaced time series using the zoo (Zeileis ordered observations) package
@@ -212,7 +213,7 @@ head(z_1335)
 
 ## Decomposition
 
-Decomposition separates out a times series `\(Y_{t}\)` into a seasonal `\(S_{t}\)`, trend `\(T_{t}\)`, and error/residual `\(E_{t}\)` components.
+Decomposition separates out a times series `\(Y_{t}\)` into a seasonal `\(S_{t}\)`, trend `\(T_{t}\)`, and error/residual `\(E_{t}\)` components. NOTE: there are lot of different words for this last component - irregular, random, residual, etc.
 
 These elements can be *additive* when the seasonal component is relatively constant over time.
 
@@ -232,7 +233,7 @@ library(xts)
 ## The following objects are masked from 'package:dplyr':
 ## 
 ##     first, last
-xts_1335 <- as.xts(x = ave_s1335$mg_per_day, order.by = ave_s1335$Date)
+xts_1335 <- as.xts(x = ts_1335)
 
 k2 <- rollmean(xts_1335, k = 2)
 k4 <- rollmean(xts_1335, k = 4)
@@ -242,13 +243,13 @@ k32 <- rollmean(xts_1335, k = 32)
 
 kALL <- merge.xts(xts_1335, k2, k4, k8, k16, k32)
 head(kALL)
-##             xts_1335        k2        k4        k8 k16 k32
-## 1991-11-28 0.2530688 0.2460383        NA        NA  NA  NA
-## 1991-11-29 0.2390078 0.2181042 0.2155385        NA  NA  NA
-## 1991-11-30 0.1972005 0.1850386 0.2078855        NA  NA  NA
-## 1991-12-01 0.1728767 0.1976668 0.1958823 0.2283140  NA  NA
-## 1991-12-02 0.2224569 0.2067260 0.2211762 0.2286369  NA  NA
-## 1991-12-03 0.1909951 0.2446855 0.2410896 0.2342279  NA  NA
+##           xts_1335        k2        k4        k8 k16 k32
+## Nov 1991 0.2297590 0.2126010        NA        NA  NA  NA
+## Dec 1991 0.1954429 0.2354481 0.2400529        NA  NA  NA
+## Jan 1992 0.2754533 0.2675047 0.2258206        NA  NA  NA
+## Feb 1992 0.2595562 0.2161932 0.2375532 0.2258988  NA  NA
+## Mar 1992 0.1728301 0.2076017 0.2224200 0.2245342  NA  NA
+## Apr 1992 0.2423733 0.2286468 0.2117447 0.2368738  NA  NA
 plot.xts(kALL, multi.panel = TRUE)
 ```
 
@@ -272,13 +273,13 @@ In the top 'observed' plot there does not appear to be a clear case of seasonali
 ```r
 stl_1335 <- stl(ts_1335, s.window = "periodic") # deompose into seasonal, trend, and irregular components
 head(stl_1335$time.series)
-##             seasonal     trend   remainder
-## Nov 1991  0.07940866 0.2156235 -0.04196336
-## Dec 1991 -0.01238431 0.2188676  0.03252456
-## Jan 1992 -0.01100365 0.2221117 -0.01390757
-## Feb 1992 -0.01707596 0.2246125 -0.03465983
-## Mar 1992 -0.02326860 0.2271134  0.01861217
-## Apr 1992 -0.01359065 0.2288255 -0.02423981
+##              seasonal     trend    remainder
+## Nov 1991  0.021512597 0.2253694 -0.017122969
+## Dec 1991 -0.019995577 0.2243884 -0.008949903
+## Jan 1992  0.035564624 0.2234074  0.016481258
+## Feb 1992  0.024725533 0.2220857  0.012744950
+## Mar 1992 -0.007203528 0.2207641 -0.040730440
+## Apr 1992  0.028745667 0.2191495 -0.005521904
 ```
 
 The seasonal and reminder/irregular components are small compared to the trend component.
@@ -345,7 +346,7 @@ adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
 ## 	Augmented Dickey-Fuller Test
 ## 
 ## data:  ts_1335
-## Dickey-Fuller = -2.7241, Lag order = 4, p-value = 0.2763
+## Dickey-Fuller = -2.0988, Lag order = 4, p-value = 0.5357
 ## alternative hypothesis: stationary
 kpss.test(ts_1335, null = "Trend") # null hypothesis is that the ts is level/trend stationary, so do not want to reject the null, p > 0.05
 ## Warning in kpss.test(ts_1335, null = "Trend"): p-value smaller than printed p-
@@ -354,8 +355,7 @@ kpss.test(ts_1335, null = "Trend") # null hypothesis is that the ts is level/tre
 ## 	KPSS Test for Trend Stationarity
 ## 
 ## data:  ts_1335
-## KPSS Trend = 0.28448, Truncation lag parameter = 4, p-value = 0.01
-# 
+## KPSS Trend = 0.25335, Truncation lag parameter = 4, p-value = 0.01
 ```
 
 The tests indicate that the time series is not stationary. How do you make a non-stationary time series stationary?
@@ -397,7 +397,7 @@ adf.test(stationaryTS)
 ## 	Augmented Dickey-Fuller Test
 ## 
 ## data:  stationaryTS
-## Dickey-Fuller = -7.3514, Lag order = 4, p-value = 0.01
+## Dickey-Fuller = -8.1769, Lag order = 4, p-value = 0.01
 ## alternative hypothesis: stationary
 kpss.test(stationaryTS, null = "Trend")
 ## Warning in kpss.test(stationaryTS, null = "Trend"): p-value greater than printed
@@ -406,7 +406,7 @@ kpss.test(stationaryTS, null = "Trend")
 ## 	KPSS Test for Trend Stationarity
 ## 
 ## data:  stationaryTS
-## KPSS Trend = 0.029403, Truncation lag parameter = 4, p-value = 0.1
+## KPSS Trend = 0.069269, Truncation lag parameter = 4, p-value = 0.1
 ```
 
 The both tests now indicate the differenced time series is now stationary.
@@ -452,7 +452,7 @@ Box.test(ts_1335)
 ## 	Box-Pierce test
 ## 
 ## data:  ts_1335
-## X-squared = 36.1, df = 1, p-value = 1.874e-09
+## X-squared = 57.808, df = 1, p-value = 2.887e-14
 ```
 
 The p-value is significant which means the data contains significant autocorrelations.
@@ -466,17 +466,18 @@ Autoregressive (AR) models can simulate *stochastic* trends by regressing the ti
 ar_1335 <- ar(ts_1335, method = "mle")
 
 mean(ts_1335)
-## [1] 0.2461971
+## [1] 0.3390491
 ar_1335$order
-## [1] 3
+## [1] 6
 ar_1335$ar
-## [1] 0.3950686 0.1103582 0.2421397
+## [1]  0.692318630  0.056966778 -0.007328706 -0.164283447  0.023423585
+## [6]  0.284339996
 acf(ar_1335$res[-(1:ar_1335$order)], lag = 50) 
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="672" />
 
-The correlogram of residuals has a few marginally significant lags (around 15 and between 30-40). The AR(4) model is a relatively good fit for the time series.
+The correlogram of residuals has a few marginally significant lags (around 15 and between 30-40). The AR(6) model is a relatively good fit for the time series.
 
 ## Regression
 
@@ -490,25 +491,44 @@ diff <- window(ts_1335, start = 1991)
 ## Warning in window.default(x, ...): 'start' value not changed
 head(diff)
 ##            Jan       Feb       Mar       Apr May Jun Jul Aug Sep Oct       Nov
-## 1991                                                                 0.2530688
-## 1992 0.1972005 0.1728767 0.2224569 0.1909951                                  
+## 1991                                                                 0.2297590
+## 1992 0.2754533 0.2595562 0.1728301 0.2423733                                  
 ##            Dec
-## 1991 0.2390078
+## 1991 0.1954429
 ## 1992
 lm_s1335 <- lm(diff ~ time(diff)) # extract the time component as the explanatory variable
 coef(lm_s1335)
-##  (Intercept)   time(diff) 
-## -32.15810054   0.01623258
+##   (Intercept)    time(diff) 
+## -11.040746179   0.005700586
 confint(lm_s1335)
-##                    2.5 %       97.5 %
-## (Intercept) -43.55848720 -20.75771387
-## time(diff)    0.01052169   0.02194348
+##                     2.5 %     97.5 %
+## (Intercept) -31.137573143 9.05608078
+## time(diff)   -0.004366695 0.01576787
 acf(resid(lm_s1335))
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
 
-While the confidence interval does not include 0, which provides statistical evidence of increasing Compound X in the atmosphere, the ACF of the model residuals are signficantly positively autocorrelated. This means the model likely understimates the standard error and the confidence interval is too narrow.
+The confidence interval does not include 0, which means there is no statistical evidence of increasing Compound X in the atmosphere. The ACF of the model residuals are significantly positively autocorrelated meaning the model likely underestimates the standard error and the confidence interval is too narrow.
+
+## Adding a seasonal component
+
+
+```r
+Seas <- cycle(diff)
+Time <- time(diff)
+s1335_slm <- lm(ts_1335 ~ 0 + Time + factor(Seas))
+coef(s1335_slm)
+##           Time  factor(Seas)1  factor(Seas)2  factor(Seas)3  factor(Seas)4 
+##    0.005756378  -11.122691112  -11.131937489  -11.162273796  -11.124295885 
+##  factor(Seas)5  factor(Seas)6  factor(Seas)7  factor(Seas)8  factor(Seas)9 
+##  -11.155275762  -11.202207940  -11.174639108  -11.139997655  -11.123771124 
+## factor(Seas)10 factor(Seas)11 factor(Seas)12 
+##  -11.171495571  -11.139425944  -11.179592661
+acf(resid(s1335_slm))
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
 
 ## Generalised Least Squares
 
@@ -531,43 +551,24 @@ library(nlme)
 ## The following object is masked from 'package:dplyr':
 ## 
 ##     collapse
-gls_s1335 <- gls(ts_1335 ~ time(ts_1335), cor = corAR1(0.4))
+gls_s1335 <- gls(ts_1335 ~ time(ts_1335), cor = corAR1(0.7))
 coef(gls_s1335)
 ##   (Intercept) time(ts_1335) 
-##  -31.28011034    0.01579311
+##   -27.9996694     0.0141997
 confint(gls_s1335)
-##                       2.5 %       97.5 %
-## (Intercept)   -50.148432309 -12.41178837
-## time(ts_1335)   0.006341232   0.02524498
+##                      2.5 %      97.5 %
+## (Intercept)   -87.94374736 31.94440847
+## time(ts_1335)  -0.01582862  0.04422801
 acf(resid(gls_s1335))
-```
-
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
-
-The acf of the model residuals still have significant autocorrelation.
-
-## Adding a seasonal component
-
-
-```r
-Seas <- cycle(diff)
-Time <- time(diff)
-s1335_slm <- lm(ts_1335 ~ 0 + Time + factor(Seas))
-coef(s1335_slm)
-##           Time  factor(Seas)1  factor(Seas)2  factor(Seas)3  factor(Seas)4 
-##     0.01659631   -32.89287141   -32.89988569   -32.90702026   -32.89799718 
-##  factor(Seas)5  factor(Seas)6  factor(Seas)7  factor(Seas)8  factor(Seas)9 
-##   -32.87111561   -32.88731478   -32.88086313   -32.89100810   -32.89137196 
-## factor(Seas)10 factor(Seas)11 factor(Seas)12 
-##   -32.89752284   -32.80113584   -32.89359047
-acf(resid(s1335_slm))
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="672" />
 
+The  confidence interval still includes 0 and the acf of the model residuals still have significant autocorrelation.
+
 ## Autoregressive Integated Moving Average (ARIMA)
 
-Autoregressive *integrate* moving average models define the model order (*p*, *d*, *q*). 
+Autoregressive *integrated* moving average models define the model order (*p*, *d*, *q*). 
 
 [Cookbook R](https://rc2e.com/timeseriesanalysis#recipe-id085) explains it as:
 
@@ -584,21 +585,27 @@ plot(diff(ts_1335))
 
 
 ```r
-arima_1 <-  arima(ts_1335, order = c(4,1,12))
+arima_1 <-  arima(ts_1335, order = c(6,1,12))
+## Warning in arima(ts_1335, order = c(6, 1, 12)): possible convergence problem:
+## optim gave code = 1
 arima_1
 ## 
 ## Call:
-## arima(x = ts_1335, order = c(4, 1, 12))
+## arima(x = ts_1335, order = c(6, 1, 12))
 ## 
 ## Coefficients:
-##           ar1      ar2      ar3      ar4      ma1     ma2     ma3     ma4
-##       -0.2343  -0.3748  -0.2154  -0.3859  -0.3050  0.0544  0.1375  0.2879
-## s.e.   0.1679   0.1639   0.1456   0.1608   0.2137  0.1596  0.2386  0.3313
-##           ma5    ma6     ma7      ma8      ma9    ma10     ma11    ma12
-##       -0.3732  0.006  -0.047  -0.1887  -0.2032  0.1031  -0.2518  0.4761
-## s.e.   0.1768  0.141   0.169   0.1581   0.1197  0.1276   0.1537  0.1400
+## Warning in sqrt(diag(x$var.coef)): NaNs produced
+##          ar1      ar2      ar3      ar4     ar5      ar6      ma1    ma2
+##       0.3101  -0.1672  -0.2606  -0.5937  0.3171  -0.3346  -0.6401  0.161
+## s.e.  0.4987      NaN   0.1375   0.2446  0.3642      NaN   0.5091    NaN
+##          ma3     ma4      ma5     ma6      ma7     ma8     ma9    ma10     ma11
+##       0.2277  0.3546  -0.7157  0.5324  -0.1141  0.0339  0.0639  0.0186  -0.2655
+## s.e.  0.3045  0.1810   0.2855     NaN      NaN     NaN     NaN  0.1282   0.2167
+##         ma12
+##       0.2497
+## s.e.  0.1244
 ## 
-## sigma^2 estimated as 0.003314:  log likelihood = 147.01,  aic = -260.02
+## sigma^2 estimated as 0.005943:  log likelihood = 119.27,  aic = -200.54
 acf(resid(arima_1), lag = 50)
 ```
 
@@ -616,10 +623,10 @@ arima_2
 ## 
 ## Coefficients:
 ##          ar1      ma1
-##       0.1558  -0.7970
-## s.e.  0.1317   0.0825
+##       0.5484  -0.8285
+## s.e.  0.1300   0.0795
 ## 
-## sigma^2 estimated as 0.004417:  log likelihood = 136.59,  aic = -267.18
+## sigma^2 estimated as 0.007826:  log likelihood = 106.51,  aic = -207.01
 acf(resid(arima_2), lag = 50)
 ```
 
@@ -632,15 +639,15 @@ The second model had a lower AIC. Let's use the `forecast::auto.arima()` functio
 arima_3 <- auto.arima(ts_1335, seasonal = FALSE, max.p = 20, max.q = 20)
 arima_3
 ## Series: ts_1335 
-## ARIMA(0,1,1) 
+## ARIMA(1,0,0) with non-zero mean 
 ## 
 ## Coefficients:
-##           ma1
-##       -0.7212
-## s.e.   0.0771
+##          ar1    mean
+##       0.7719  0.3452
+## s.e.  0.0637  0.0362
 ## 
-## sigma^2 = 0.004519:  log likelihood = 135.9
-## AIC=-267.8   AICc=-267.68   BIC=-262.47
+## sigma^2 = 0.007892:  log likelihood = 107.77
+## AIC=-209.54   AICc=-209.31   BIC=-201.52
 acf(resid(arima_3), lag = 50)
 ```
 
@@ -661,15 +668,15 @@ A seasonal component can also be added to ARIMA. The default for `auto.arima()` 
 sarima <- auto.arima(ts_1335)
 sarima
 ## Series: ts_1335 
-## ARIMA(0,1,1)(0,0,1)[12] 
+## ARIMA(1,0,0) with non-zero mean 
 ## 
 ## Coefficients:
-##           ma1    sma1
-##       -0.6725  0.2765
-## s.e.   0.0849  0.1013
+##          ar1    mean
+##       0.7719  0.3452
+## s.e.  0.0637  0.0362
 ## 
-## sigma^2 = 0.004255:  log likelihood = 139.19
-## AIC=-272.38   AICc=-272.14   BIC=-264.38
+## sigma^2 = 0.007892:  log likelihood = 107.77
+## AIC=-209.54   AICc=-209.31   BIC=-201.52
 acf(resid(sarima), lag = 50)
 ```
 

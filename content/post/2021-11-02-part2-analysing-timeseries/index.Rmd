@@ -11,6 +11,7 @@ output:
     df_print: tibble
     toc: true
     number_sections: TRUE
+    math: true
 ---
 
 
@@ -97,7 +98,7 @@ The maximum number of samples we have per month is 7. Probably not enough to do 
 
 ```{r}
 ave_s1335 <- s1335 %>% 
-   group_by(Year, Month, Site, Date) %>% 
+   group_by(Year, Month, Site) %>% 
    summarize(mg_per_day = mean(mg_per_day),
              SD = sd(mg_per_day))
 ```
@@ -115,7 +116,7 @@ hist(as.Date(s1335$Date), # change POSIXct to Date object
 
 Let's convert our data into a time series. Times series data must be sampled at equispaced points in time.
 
-There are several different time series object that have different functionalalities such as working with irregularly spaced time series. See this [resource](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf).
+There are several different time series object that have different functionalities such as working with irregularly spaced time series. See this [resource](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf).
 
 ```{r}
 ts_1335 <- ts(ave_s1335$mg_per_day, frequency = 12,
@@ -123,8 +124,6 @@ ts_1335 <- ts(ave_s1335$mg_per_day, frequency = 12,
 
 class(ts_1335) # check the object class
 ts_1335 # see the data
-
-
 ```
 
 ## Create a irregularly spaced time series using the zoo (Zeileis ordered observations) package
@@ -140,7 +139,7 @@ head(z_1335)
 
 ## Decomposition
 
-Decomposition separates out a times series $Y_{t}$ into a seasonal $S_{t}$, trend $T_{t}$, and error/residual $E_{t}$ components.
+Decomposition separates out a times series $Y_{t}$ into a seasonal $S_{t}$, trend $T_{t}$, and error/residual $E_{t}$ components. NOTE: there are lot of different words for this last component - irregular, random, residual, etc.
 
 These elements can be *additive* when the seasonal component is relatively constant over time.
 
@@ -154,7 +153,7 @@ The `decompose()` function uses a moving average (MA) approach to filter the dat
 
 ```{r}
 library(xts)
-xts_1335 <- as.xts(x = ave_s1335$mg_per_day, order.by = ave_s1335$Date)
+xts_1335 <- as.xts(x = ts_1335)
 
 k2 <- rollmean(xts_1335, k = 2)
 k4 <- rollmean(xts_1335, k = 4)
@@ -235,7 +234,6 @@ There are a few tests for stationarity with the `tseries` package: Augmented Dic
 ```{r}
 adf.test(ts_1335) # p-value < 0.05 indicates the TS is stationary
 kpss.test(ts_1335, null = "Trend") # null hypothesis is that the ts is level/trend stationary, so do not want to reject the null, p > 0.05
-# 
 ```
 
 The tests indicate that the time series is not stationary. How do you make a non-stationary time series stationary?
@@ -317,7 +315,7 @@ ar_1335$ar
 acf(ar_1335$res[-(1:ar_1335$order)], lag = 50) 
 ```
 
-The correlogram of residuals has a few marginally significant lags (around 15 and between 30-40). The AR(4) model is a relatively good fit for the time series.
+The correlogram of residuals has a few marginally significant lags (around 15 and between 30-40). The AR(6) model is a relatively good fit for the time series.
 
 ## Regression
 
@@ -336,7 +334,17 @@ confint(lm_s1335)
 acf(resid(lm_s1335))
 ```
 
-While the confidence interval does not include 0, which provides statistical evidence of increasing Compound X in the atmosphere, the ACF of the model residuals are signficantly positively autocorrelated. This means the model likely understimates the standard error and the confidence interval is too narrow.
+The confidence interval does not include 0, which means there is no statistical evidence of increasing Compound X in the atmosphere. The ACF of the model residuals are significantly positively autocorrelated meaning the model likely underestimates the standard error and the confidence interval is too narrow.
+
+## Adding a seasonal component
+
+```{r}
+Seas <- cycle(diff)
+Time <- time(diff)
+s1335_slm <- lm(ts_1335 ~ 0 + Time + factor(Seas))
+coef(s1335_slm)
+acf(resid(s1335_slm))
+```
 
 ## Generalised Least Squares
 
@@ -350,27 +358,17 @@ A correlation structure is defined using the `cor` argument. The value is estima
 
 ```{r}
 library(nlme)
-gls_s1335 <- gls(ts_1335 ~ time(ts_1335), cor = corAR1(0.4))
+gls_s1335 <- gls(ts_1335 ~ time(ts_1335), cor = corAR1(0.7))
 coef(gls_s1335)
 confint(gls_s1335)
 acf(resid(gls_s1335))
 ```
 
-The acf of the model residuals still have significant autocorrelation.
-
-## Adding a seasonal component
-
-```{r}
-Seas <- cycle(diff)
-Time <- time(diff)
-s1335_slm <- lm(ts_1335 ~ 0 + Time + factor(Seas))
-coef(s1335_slm)
-acf(resid(s1335_slm))
-```
+The  confidence interval still includes 0 and the acf of the model residuals still have significant autocorrelation.
 
 ## Autoregressive Integated Moving Average (ARIMA)
 
-Autoregressive *integrate* moving average models define the model order (*p*, *d*, *q*). 
+Autoregressive *integrated* moving average models define the model order (*p*, *d*, *q*). 
 
 [Cookbook R](https://rc2e.com/timeseriesanalysis#recipe-id085) explains it as:
 
@@ -383,7 +381,7 @@ plot(diff(ts_1335))
 ```
 
 ```{r}
-arima_1 <-  arima(ts_1335, order = c(4,1,12))
+arima_1 <-  arima(ts_1335, order = c(6,1,12))
 arima_1
 acf(resid(arima_1), lag = 50)
 ```
