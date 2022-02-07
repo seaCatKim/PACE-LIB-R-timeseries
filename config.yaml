@@ -2,7 +2,7 @@ baseurl: https://qaehs-lib-rtimeseries2022.netlify.app/
 languageCode: en-us
 title: UQ Library x QAEHS Time Series R Workshop
 theme: hugo-lithium
-googleAnalytics: G-0SXXTHJXTY
+googleAnalytics: UA-219583015-1
 disqusShortname: ''
 ignoreFiles:
   - \.Rmd$
