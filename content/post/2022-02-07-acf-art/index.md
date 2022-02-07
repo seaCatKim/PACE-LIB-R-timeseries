@@ -7,7 +7,7 @@ categories: []
 tags: []
 ---
 
-This series of artwork explains the autocorrelation function (ACF). Dr Allison Horst's RStats artwork is freely available on [her GitHub repo](https://github.com/allisonhorst/stats-illustrations/).
+This series of artwork explains the autocorrelation function (ACF). Dr Allison Horst's RStats artwork is freely available on her [GitHub repo](https://github.com/allisonhorst/stats-illustrations/).
 
 ![A line of related fuzzy monsters that ranges from more distant relatives (toward the left) to the current generation on the right. Several more recent generations are labeled, from “ME” on the far right, then “MY PARENT”, “MY GRANDPARENT”, “MY GREAT-GRANDPARENT” and “MY GREAT-GREAT GRANDPARENT” moving toward the left. The current generation monster on the left is saying “Hello! Meet some of my ancestors.” Stylized text at the top reads “intro to the autocorrelation function (ACF).”](acf_1.jpg)
 
