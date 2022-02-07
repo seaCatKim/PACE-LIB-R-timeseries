@@ -277,7 +277,7 @@ The cutest explanation of ACF by Dr Allison Horst:
 
 ![acf art by Allison Horst](acf_1.jpg)
 
-See the full artwork series explaining ACF [here](https://qaehs-lib-rtimeseries2022.netlify.app/2022/02/03/art-acf/).
+See the full artwork series explaining ACF [here](https://qaehs-lib-rtimeseries2022.netlify.app/2022/02/03/acf-art/).
 
 ```{r}
 acf(s1335$mg_per_day)
