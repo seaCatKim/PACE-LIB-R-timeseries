@@ -8,7 +8,7 @@ categories: ["R"]
 tags: [""]
 output:
   blogdown::html_page:
-   # df_print: tibble
+    df_print: tibble
     toc: true
     number_sections: TRUE
 ---
@@ -68,8 +68,11 @@ Let's download our dataset form the web:
 
 ```{r download data, eval=FALSE}
 download.file("https://github.com/seaCatKim/PACE-LIB-R-timeseries/raw/main/content/post/2020-12-01-part1-working-timeseries-data/data/analytes_data.xlsx",
-              destfile = "data/analytes_data.xlsx")
+              destfile = "data/analytes_data.xlsx",
+              mode = 'wb')
 ```
+
+> The `mode = 'wb'` is binary and necessary for `download.file()` to work on Windows OS.
 
 ### Read in the data
 
