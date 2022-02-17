@@ -199,7 +199,7 @@ ts_1335 # see the data
 
 ## Create a irregularly spaced time series using the zoo (Zeileis ordered observations) package
 
-The `zoo` class is a flexible time series data with an ordered time index. The data is stored in a matrix with vector date information attached. Can be regularly or irregularly spaced.
+The `zoo` class is a flexible time series data with an ordered time index. The data is stored in a matrix with vector date information attached. Can be regularly or irregularly spaced. See this [document](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf).
 
 
 ```r
@@ -213,7 +213,7 @@ head(z_1335)
 
 ## Decomposition
 
-Decomposition separates out a times series `\(Y_{t}\)` into a seasonal `\(S_{t}\)`, trend `\(T_{t}\)`, and error/residual `\(E_{t}\)` components. NOTE: there are lot of different words for this last component - irregular, random, residual, etc.
+Decomposition separates out a times series `\(Y_{t}\)` into a seasonal `\(S_{t}\)`, trend `\(T_{t}\)`, and error/residual `\(E_{t}\)` components. NOTE: there are lot of different words for this last component - irregular, random, residual, etc. See resources at the bottom.
 
 These elements can be *additive* when the seasonal component is relatively constant over time.
 
@@ -223,7 +223,7 @@ Or *multiplicative* when seasonal effects tend to increase as the trend increase
 
 `$$Y_{t} = S_{t} * T_{t} * E_{t}$$`
 
-The `decompose()` function uses a moving average (MA) approach to filter the data. The *window* or period over which you after is based on the frequency of the data. For example, monthly data can be averaged across a 12 month period.
+The `decompose()` function uses a moving average (MA) approach to filter the data. The *window* or period over which you after is based on the frequency of the data. For example, monthly data can be averaged across a 12 month period. Original code from [Time Series Analysis with R Ch. 7.2.1](https://nicolarighetti.github.io/Time-Series-Analysis-With-R/structural-decomposition.html#components-of-a-time-series).
 
 
 ```r
@@ -299,7 +299,7 @@ plot(sa_1335)
 
 These two plots are pretty much the same. There does not seem to be a large seasonality component in the data.
 
-It can also be visualised using on the same plot to highlight the small effect of seasonality.
+It can also be visualised using on the same plot to highlight the small effect of seasonality. Code modified from [Time Series Analysis with R Ch. 7.3](https://nicolarighetti.github.io/Time-Series-Analysis-With-R/structural-decomposition.html#seasonality).
 
 
 ```r
@@ -320,7 +320,10 @@ Plot the time series against the seasons in separate years.
 
 ```r
 par(mfrow = c(1,1))
-seasonplot(sa_1335, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: Site 1335")
+seasonplot(sa_1335, 12, 
+           col = rainbow(12), 
+           year.labels = TRUE,
+           main = "Seasonal plot: Site 1335")
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" />
@@ -458,6 +461,10 @@ Box.test(ts_1335)
 ```
 
 The p-value is significant which means the data contains significant autocorrelations.
+
+## Models for time series data
+
+> Most of the content below follows the great book: Introductory Time Series with R by Cowpertwait & Metcalfe.
 
 ## Autoregressive model
 
